@@ -22,6 +22,7 @@
     --cat-violation:#ad3527; --cat-violation-bg:#f7e5e1;
     --cat-exception:#b8570f; --cat-exception-bg:#f7e9db;
     --cat-conflict:#6a4796; --cat-conflict-bg:#ece4f5;
+    --field-pflicht:#c7a23a; --field-ggf:#8b93a6; --field-frei:#5fa77c;
     --focus:#147a72;
     --shadow-doc: 0 1px 2px rgba(20,30,28,.06), 0 10px 30px -12px rgba(20,30,28,.25);
   }
@@ -40,6 +41,7 @@
       --cat-violation:#e07364; --cat-violation-bg:#3a1c16;
       --cat-exception:#e2934f; --cat-exception-bg:#3a260f;
       --cat-conflict:#b79bdb; --cat-conflict-bg:#2a2140;
+      --field-pflicht:#e0bf5f; --field-ggf:#9aa3b8; --field-frei:#7dd0a1;
       --shadow-doc: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -12px rgba(0,0,0,.6);
     }
   }
@@ -57,6 +59,7 @@
     --cat-violation:#e07364; --cat-violation-bg:#3a1c16;
     --cat-exception:#e2934f; --cat-exception-bg:#3a260f;
     --cat-conflict:#b79bdb; --cat-conflict-bg:#2a2140;
+    --field-pflicht:#e0bf5f; --field-ggf:#9aa3b8; --field-frei:#7dd0a1;
     --shadow-doc: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -12px rgba(0,0,0,.6);
   }
 
@@ -73,7 +76,7 @@
   a{color:var(--accent);}
   :focus-visible{outline:2px solid var(--focus); outline-offset:2px; border-radius:4px;}
 
-  .app{max-width:1040px; margin:0 auto; padding-block:22px 60px;}
+  .app{max-width:1080px; margin:0 auto; padding-block:22px 60px;}
 
   /* ---------- Rail / Header ---------- */
   .rail{
@@ -95,16 +98,18 @@
   .brand p{margin:2px 0 0; font-size:.86rem; color:var(--rail-text-soft);}
   .meta{
     font-size:.72rem; text-transform:uppercase; letter-spacing:.07em;
-    color:var(--rail-text-soft); text-align:right; max-width:220px; line-height:1.5;
+    color:var(--rail-text-soft); text-align:right; max-width:230px; line-height:1.5;
   }
-  .disclaimer{
+  .source-line{
     margin:16px 0 0; padding:10px 14px; border-radius:10px;
     background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14);
     font-size:.8rem; line-height:1.55; color:var(--rail-text-soft);
     display:flex; gap:10px; align-items:flex-start;
   }
-  .disclaimer svg{flex:none; width:16px; height:16px; margin-top:2px; color:#e2c05a;}
-  .disclaimer strong{color:var(--rail-text); font-weight:600;}
+  .source-line svg{flex:none; width:16px; height:16px; margin-top:2px; color:#7fd9c8;}
+  .source-line strong{color:var(--rail-text); font-weight:600;}
+  .source-line + .source-line{margin-top:8px;}
+  .source-line.warn svg{color:#e2c05a;}
 
   /* ---------- Stage controls ---------- */
   .stage-controls{
@@ -131,6 +136,14 @@
   .btn-ghost:hover{border-color:var(--accent); color:var(--accent);}
   .btn svg{width:15px; height:15px;}
 
+  /* ---------- Field-obligation legend ---------- */
+  .legend{display:flex; gap:16px; flex-wrap:wrap; margin:10px 0 0; font-size:.74rem; color:var(--ink-soft);}
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .legend i{width:10px; height:10px; border-radius:3px; display:inline-block; flex:none;}
+  .legend .lp{background:var(--field-pflicht);}
+  .legend .lg{background:var(--field-ggf);}
+  .legend .lf{background:var(--field-frei);}
+
   /* ---------- Document stage ---------- */
   .doc-wrap{margin-top:14px;}
   .doc-toolbar{
@@ -149,25 +162,30 @@
     background:var(--paper); color:var(--ink-doc);
     border:1px solid var(--paper-edge); border-radius:14px;
     box-shadow:var(--shadow-doc);
-    padding:clamp(20px,4vw,42px);
+    padding:clamp(18px,4vw,38px);
     font-family:"Source Serif 4", Georgia, serif;
   }
   .document h3, .document h4{font-family:"IBM Plex Sans",sans-serif;}
   .document .table-scroll{overflow-x:auto;}
-  .document table{border-collapse:collapse; width:100%; min-width:560px;}
+  .document table{border-collapse:collapse; width:100%; min-width:760px;}
   .document th{
-    font:600 .68rem/1.2 "IBM Plex Sans",sans-serif; text-transform:uppercase; letter-spacing:.05em;
-    text-align:left; color:var(--ink-doc-soft); padding:0 8px 8px 0; border-bottom:1.5px solid var(--paper-rule);
+    font:600 .64rem/1.2 "IBM Plex Sans",sans-serif; text-transform:uppercase; letter-spacing:.04em;
+    text-align:left; color:var(--ink-doc-soft); padding:0 7px 7px 0; border-bottom:1.5px solid var(--paper-rule);
+    white-space:nowrap;
   }
   .document td{
-    padding:9px 8px; border-bottom:1px solid var(--paper-rule); font-size:.94rem; vertical-align:top;
+    padding:8px 7px; border-bottom:1px solid var(--paper-rule); font-size:.82rem; vertical-align:top;
   }
   .document td.num, .document th.num{text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;}
   .document tr:last-child td{border-bottom:1.5px solid var(--paper-rule);}
+  .praefix-chip{
+    display:inline-block; font:700 .68rem/1 "IBM Plex Mono",monospace; padding:2px 5px;
+    border-radius:4px; background:rgba(20,122,114,.12); color:var(--accent-strong); margin-right:2px;
+  }
 
   .flag{
     display:inline-flex; align-items:center; gap:4px; margin-left:6px;
-    font:600 .66rem/1 "IBM Plex Sans",sans-serif; text-transform:uppercase; letter-spacing:.03em;
+    font:600 .64rem/1 "IBM Plex Sans",sans-serif; text-transform:uppercase; letter-spacing:.03em;
     padding:3px 7px 3px 6px; border-radius:999px; cursor:help; white-space:nowrap;
   }
   .flag svg{width:10px; height:10px;}
@@ -176,59 +194,65 @@
   .flag-exception{background:var(--cat-exception-bg); color:var(--cat-exception);}
   .flag-conflict{background:var(--cat-conflict-bg); color:var(--cat-conflict);}
 
-  .footnote-ref{font:600 .72rem/1 "IBM Plex Sans",sans-serif; color:var(--accent-strong); vertical-align:super; margin-left:2px;}
-  .footnotes{margin-top:14px; padding-top:10px; border-top:1px dashed var(--paper-rule); font-size:.82rem; color:var(--ink-doc-soft);}
-  .footnotes li{margin-bottom:4px;}
-
-  .sum-block{display:flex; justify-content:flex-end; margin-top:6px;}
-  .sum-block table{width:auto; min-width:260px;}
-  .sum-block td{padding:5px 4px;}
+  .sum-block{display:flex; justify-content:flex-end; margin-top:10px;}
+  .sum-block table{width:auto; min-width:320px;}
+  .sum-block td{padding:4px 4px; font-size:.84rem;}
   .sum-block tr.total td{font-weight:700; font-size:1.05rem; border-top:1.5px solid var(--paper-rule); border-bottom:none; padding-top:9px;}
+  .sum-block tr.sub td{color:var(--ink-doc-soft);}
+
+  /* Field blocks (Rechnungsempfänger, -steller, Patient, Arzt, Diagnose...) */
+  .field-block{font-family:"IBM Plex Sans",sans-serif; font-size:.86rem; line-height:1.7;}
+  .field-block .label{
+    font:600 .64rem/1 "IBM Plex Sans"; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-doc-soft);
+    display:flex; align-items:center; gap:5px; margin-bottom:2px;
+  }
+  .field-block .label i{width:7px; height:7px; border-radius:2px; display:inline-block; flex:none;}
+  .field-dot-p{background:var(--field-pflicht);} .field-dot-g{background:var(--field-ggf);} .field-dot-f{background:var(--field-frei);}
+  .blocks-row{display:grid; grid-template-columns:1fr 1fr; gap:26px;}
+  @media (max-width:720px){.blocks-row{grid-template-columns:1fr;}}
+
+  .diag-line{margin:16px 0 18px; padding:11px 14px; border-radius:10px; background:rgba(0,0,0,.035); border:1px solid var(--paper-rule);}
+  .diag-line.is-flagged{background:var(--cat-violation-bg);}
+  .diag-line.is-exception{background:var(--cat-exception-bg);}
+  .section-title{font-family:"IBM Plex Sans",sans-serif; font-weight:700; font-size:.82rem; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-doc-soft); margin:22px 0 10px; padding-top:14px; border-top:1px solid var(--paper-rule);}
+  .section-title:first-child{border-top:none; padding-top:0; margin-top:0;}
 
   /* Layout A: klassisch tabellarisch */
-  .lay-a .doc-head{display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap; border-bottom:2px solid var(--ink-doc); padding-bottom:14px; margin-bottom:18px;}
+  .lay-a .doc-head{display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap; border-bottom:2px solid var(--ink-doc); padding-bottom:14px; margin-bottom:6px;}
   .lay-a .practice{font-family:"IBM Plex Sans",sans-serif;}
   .lay-a .practice .name{font-weight:700; font-size:1.05rem;}
   .lay-a .practice .sub{font-size:.82rem; color:var(--ink-doc-soft); margin-top:2px; line-height:1.5;}
   .lay-a .recipient{text-align:right; font-size:.88rem; line-height:1.6;}
-  .lay-a .doc-title{font-family:"IBM Plex Sans",sans-serif; font-weight:700; font-size:1.2rem; margin:0 0 4px;}
+  .lay-a .doc-title{font-family:"IBM Plex Sans",sans-serif; font-weight:700; font-size:1.2rem; margin:14px 0 4px;}
   .lay-a .doc-sub{font-size:.84rem; color:var(--ink-doc-soft); margin:0 0 18px;}
 
   /* Layout B: PVS-Stil */
-  .lay-b .doc-head{display:grid; grid-template-columns:1fr auto; gap:20px; align-items:start; margin-bottom:18px;}
+  .lay-b .doc-head{display:grid; grid-template-columns:1fr auto; gap:20px; align-items:start; margin-bottom:14px;}
   .lay-b .pvs-tag{font-family:"IBM Plex Sans",sans-serif; font:700 .68rem/1 "IBM Plex Sans"; text-transform:uppercase; letter-spacing:.08em; color:var(--accent-strong); margin-bottom:6px;}
   .lay-b .doc-title{font-family:"IBM Plex Sans",sans-serif; font-weight:700; font-size:1.15rem; margin:0 0 8px;}
   .lay-b .idbox{
     font-family:"IBM Plex Mono",monospace; font-size:.76rem; background:rgba(0,0,0,.04);
-    border:1px solid var(--paper-rule); border-radius:10px; padding:12px 14px; line-height:1.9; min-width:220px;
+    border:1px solid var(--paper-rule); border-radius:10px; padding:12px 14px; line-height:1.9; min-width:230px;
   }
-  .lay-b .idbox b{display:block; color:var(--ink-doc-soft); font-weight:500; font-size:.66rem; text-transform:uppercase; letter-spacing:.05em;}
-  .lay-b .parties{display:flex; gap:32px; flex-wrap:wrap; font-size:.86rem; margin-bottom:18px;}
-  .lay-b .parties div{line-height:1.6;}
-  .lay-b .parties .label{font-family:"IBM Plex Sans",sans-serif; font:600 .66rem/1 "IBM Plex Sans"; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-doc-soft); display:block; margin-bottom:4px;}
+  .lay-b .idbox b{display:block; color:var(--ink-doc-soft); font-weight:500; font-size:.64rem; text-transform:uppercase; letter-spacing:.05em;}
   .lay-b .foot-note{margin-top:18px; font-size:.76rem; color:var(--ink-doc-soft); border-top:1px solid var(--paper-rule); padding-top:10px; line-height:1.6;}
 
   /* Layout C: Brief-Stil */
-  .lay-c .doc-head{margin-bottom:22px;}
+  .lay-c .doc-head{margin-bottom:6px;}
   .lay-c .practice-line{font-family:"IBM Plex Sans",sans-serif; font-weight:700; font-size:1rem;}
   .lay-c .addr-line{font-size:.8rem; color:var(--ink-doc-soft); margin-top:2px;}
-  .lay-c .recipient{margin-top:22px; font-size:.9rem; line-height:1.6;}
-  .lay-c .place-date{text-align:right; font-size:.84rem; color:var(--ink-doc-soft); margin-top:14px;}
-  .lay-c .subject{font-weight:700; margin-top:20px; font-family:"IBM Plex Sans",sans-serif; font-size:.98rem;}
-  .lay-c .salutation{margin-top:16px;}
-  .lay-c .closing{margin-top:22px; line-height:1.7;}
+  .lay-c .recipient{margin-top:18px; font-size:.9rem; line-height:1.6;}
+  .lay-c .place-date{text-align:right; font-size:.84rem; color:var(--ink-doc-soft); margin-top:12px;}
+  .lay-c .subject{font-weight:700; margin-top:18px; font-family:"IBM Plex Sans",sans-serif; font-size:.98rem;}
+  .lay-c .salutation{margin-top:14px;}
+  .lay-c .closing{margin-top:20px; line-height:1.7;}
 
-  .patient-block, .diag-block{font-family:"IBM Plex Sans",sans-serif; font-size:.86rem; line-height:1.7;}
-  .patient-block .label, .diag-block .label{font:600 .66rem/1 "IBM Plex Sans"; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-doc-soft);}
-
-  .diag-line{margin:16px 0 18px; padding:11px 14px; border-radius:10px; background:rgba(0,0,0,.035); border:1px solid var(--paper-rule); font-family:"IBM Plex Sans",sans-serif; font-size:.86rem;}
-  .diag-line .label{display:block; margin-bottom:3px;}
-  .diag-line.is-flagged{background:var(--cat-violation-bg);}
+  .schlussvermerk{margin-top:22px; padding-top:12px; border-top:1px dashed var(--paper-rule); font-size:.78rem; font-style:italic; color:var(--ink-doc-soft);}
 
   /* ---------- Category picker ---------- */
   .category-picker{margin-top:34px;}
   .category-picker > h2{margin:0 0 4px; font-size:1.05rem;}
-  .category-picker > p{margin:0 0 16px; color:var(--ink-soft); font-size:.9rem; max-width:62ch;}
+  .category-picker > p{margin:0 0 16px; color:var(--ink-soft); font-size:.9rem; max-width:64ch;}
   .category-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
   @media (max-width:900px){.category-grid{grid-template-columns:repeat(2,1fr);}}
   @media (max-width:520px){.category-grid{grid-template-columns:1fr;}}
@@ -300,14 +324,22 @@
         </span>
         <div>
           <h1>GOÄneu Belegwerkstatt</h1>
-          <p class="tag">Testfallgenerator für Rechnungsinhalte nach GOÄ-§12-Systematik</p>
+          <p class="tag">Testfallgenerator auf Basis des GOÄ-Rechnungsformulars (Anlage 2)</p>
         </div>
       </div>
       <div class="meta">Continentale · Teilprojekte „Leistungsgrundsätze &amp; Bestands-/Informationsmanagement“ und „Kundendienstprozesse &amp; Abrechnungstechnik“</div>
     </div>
-    <p class="disclaimer">
+    <p class="source-line">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+      <span><strong>Quellen:</strong> vollständiger GOÄneu-Verordnungsentwurf (§§ 1–13 nebst Gebührenverzeichnis) sowie die „Ausfüllhinweise zum GOÄ-Rechnungsformular (§ 12 GOÄ, Anlage 2)“, Version 2.0 vom 31.08.2026, AG Recht (BÄK/PKV-Verband). Feldnamen, Präfixe (V/F/E/W/R/A), Faktor-Gründe (HV/BT/ST/NT/AB) und Pflichtangaben-Logik sind direkt daraus übernommen.</span>
+    </p>
+    <p class="source-line">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+      <span><strong>Zentrale Strukturänderung ggü. der alten GOÄ:</strong> § 5 GOÄneu kennt keinen Steigerungsfaktor mit Schwellenwert (2,3-/1,8-fach) mehr — der Gebührensatz ist ein fester Eurobetrag je Ziffer. Ein abweichender Faktor ist nur bei individueller Honorarvereinbarung nach § 2 („HV“, vor Behandlung schriftlich), bei einer Allgemeinen Bestimmung („AB“) oder bei Basis-/Standard-/Notlagentarif-Versicherten („BT“/„ST“/„NT“, § 12 Abs. 2 Nr. 6 i. V. m. § 75 SGB V) zulässig.</span>
+    </p>
+    <p class="source-line warn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 16.5h.01M10.3 3.9 2.5 18a1.6 1.6 0 0 0 1.4 2.4h16.2a1.6 1.6 0 0 0 1.4-2.4L13.7 3.9a1.6 1.6 0 0 0-2.8 0Z"/></svg>
-      <span><strong>Synthetische Testdaten.</strong> Praxen, Patient:innen, Ziffern und Beträge sind frei erzeugt. Inhaltliche Anforderungen orientieren sich an der bekannten §12-Systematik der geltenden GOÄ (Rechnungsinhalte, Steigerungssatz/Schwellenwert, Analog­kennzeichnung, Sachkosten, Diagnoseangabe) als fachlicher Näherung an die GOÄneu-Reform. Das endgültige GOÄneu-Rechnungsformular des Verbands ist hier nicht hinterlegt — bitte Ziffern, Sätze und Wortlaut vor Verwendung gegen den finalen Verbandstext abgleichen. §12 regelt <em>Rechnungsinhalte</em>, kein Layout — deshalb wechselt das Beleg-Layout bei jeder Erzeugung.</span>
+      <span><strong>Synthetische Testdaten.</strong> Praxen, Patient:innen, GOÄ-Ziffern und Beträge sind frei erzeugt. Das Formular regelt Rechnungs<em>inhalte</em> und deren Tabellenreihenfolge, nicht das grafische Layout des Rechnungskopfs (Kap. 2.1.2 / 3) — deshalb wechselt hier nur die Kopf-Gestaltung, nie die Feldnamen oder Spaltenreihenfolge der Vergütungstabelle.</span>
     </p>
   </header>
 
@@ -315,7 +347,7 @@
     <section class="stage-controls">
       <div class="stage-heading">
         <span class="step-pill" id="step-pill">Schritt 1 · Beispielbeleg</span>
-        <h2>Echter Beispielbeleg</h2>
+        <h2 id="stage-heading-text">Echter Beispielbeleg</h2>
       </div>
       <div class="stage-controls-actions">
         <button class="btn btn-ghost" id="btn-theme" type="button" title="Theme umschalten" aria-label="Theme umschalten">
@@ -327,6 +359,11 @@
         </button>
       </div>
     </section>
+    <div class="legend">
+      <span><i class="lp"></i> Pflichtangabe</span>
+      <span><i class="lg"></i> ggf. Pflichtangabe (falls einschlägig)</span>
+      <span><i class="lf"></i> freiwillige Angabe</span>
+    </div>
 
     <div class="doc-wrap">
       <div class="doc-toolbar">
@@ -338,7 +375,7 @@
 
     <section class="category-picker">
       <h2>Diesen Beleg als Testfall einordnen</h2>
-      <p>Der Beleg oben ist ein vollständig korrekter Ausgangsfall. Wähle eine Kategorie — die Inhalte werden gezielt so verändert, dass sie exakt diese Testfallklasse abbilden; das Layout bleibt dabei erhalten.</p>
+      <p>Der Beleg oben ist ein vollständig korrekter Ausgangsfall. Wähle eine Kategorie — die Rechnungsinhalte werden gezielt so verändert, dass sie exakt diese Testfallklasse abbilden; Formularfelder, Spalten und Kopf-Layout bleiben unverändert.</p>
       <div class="category-grid" id="category-grid"></div>
     </section>
 
@@ -347,7 +384,7 @@
 
   <footer>
     <h4>Zu den Kategorien</h4>
-    <p>Die fünf Kategorien greifen die Continentale-Anforderung an die automatisierte Testfallerzeugung auf: <strong>korrekte Fälle</strong> (fehlerfrei), <strong>Grenzfälle</strong> (an definierten Auslegungsgrenzen, z.&nbsp;B. Schwellenwert, Analogberechnung, Kennzeichnungspflicht), <strong>Verstöße</strong> (gezielte Regel-/Formatverletzung), <strong>Ausnahmefälle</strong> (z.&nbsp;B. Notfallbehandlung) und <strong>Konfliktfälle</strong> (widersprüchliche/überlappende Regeln). Jede Generierung würfelt Praxis, Fachrichtung, Diagnose, Leistungsziffern und Beleg-Layout neu aus.</p>
+    <p>Die fünf Kategorien greifen die Continentale-Anforderung an die automatisierte Testfallerzeugung auf: <strong>korrekte Fälle</strong> (fehlerfrei), <strong>Grenzfälle</strong> (an definierten Auslegungsgrenzen des Formulars, z.&nbsp;B. Faktor-Grund-Multiplikation, 25-km-Grenze Wegegeld/Reiseentschädigung, Minderungssatz §6a), <strong>Verstöße</strong> (gezielte Verletzung einer im Formular als Pflicht- bzw. ggf.-Pflichtangabe definierten Vorgabe), <strong>Ausnahmefälle</strong> (im Formular selbst vorgesehene Abweichungen, z.&nbsp;B. entfallende Diagnoseangabe bei schutzwürdigen Interessen) und <strong>Konfliktfälle</strong> (widersprüchliche Kombinationen von Präfixen/Feldern, z.&nbsp;B. Wegegeld und Reiseentschädigung gleichzeitig). Jede Generierung würfelt Praxis, Fachrichtung, Diagnose, Leistungsziffern und Beleg-Kopf-Layout neu aus.</p>
   </footer>
 </div>
 
@@ -361,136 +398,212 @@ const VORNAMEN_F = ["Sabine","Andrea","Claudia","Petra","Susanne","Monika","Birg
 const NACHNAMEN = ["Müller","Schmidt","Schneider","Fischer","Weber","Meyer","Wagner","Becker","Schulz","Hoffmann","Koch","Richter","Klein","Wolf","Neumann","Schwarz","Zimmermann","Braun","Krüger","Hartmann"];
 const ORTE = [{ort:"Dortmund",plz:"44135"},{ort:"Köln",plz:"50667"},{ort:"Leipzig",plz:"04109"},{ort:"Freiburg im Breisgau",plz:"79098"},{ort:"Hannover",plz:"30159"},{ort:"Nürnberg",plz:"90402"},{ort:"Mainz",plz:"55116"}];
 const STRASSEN = ["Bahnhofstraße","Marktplatz","Lindenallee","Kaiserstraße","Gartenweg","Schillerstraße","Amselweg","Rathausplatz","Wallstraße"];
+const ANREDEN = ["Herr","Frau"];
 
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function pickN(arr,n){ const c=arr.slice(); const out=[]; n=Math.min(n,c.length); for(let i=0;i<n;i++){ out.push(c.splice(Math.floor(Math.random()*c.length),1)[0]); } return out; }
 function randInt(a,b){ return a+Math.floor(Math.random()*(b-a+1)); }
 function euro(n){ return n.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2})+" €"; }
 function fmtDate(d){ return d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"}); }
-function fmtTime(d){ return d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}); }
 function addDays(d,n){ const c=new Date(d); c.setDate(c.getDate()+n); return c; }
 function round2(n){ return Math.round(n*100)/100; }
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function dot(kind){ return '<i class="field-dot-'+kind+'"></i>'; } // p=Pflicht, g=ggf.Pflicht, f=freiwillig
 
-/* GOÄ-Ziffernkatalog (Nr./Bezeichnung/1-facher Satz an aktueller GOÄ orientiert, gerundet, illustrativ) */
+/* GOÄ-Ziffernkatalog: Nr., Bezeichnung (Titel der Leistungslegende), 1-facher Satz (illustrativ, gerundet an aktueller GOÄ orientiert) */
 const Z = {
-  beratung:        {nr:"1",   bez:"Beratung – auch mittels Fernsprecher",              satz1:4.66,  art:"persoenlich"},
-  einBeratung:      {nr:"3",   bez:"Eingehende Beratung (mind. 10 Minuten Dauer)",       satz1:8.74,  art:"persoenlich"},
-  symptUnters:      {nr:"5",   bez:"Symptombezogene Untersuchung",                       satz1:4.66,  art:"persoenlich"},
-  ganzkoerper:      {nr:"7",   bez:"Ganzkörperstatus",                                   satz1:9.33,  art:"persoenlich"},
-  blutentnahme:     {nr:"250", bez:"Blutentnahme",                                       satz1:2.33,  art:"persoenlich"},
-  reflexpruefung:   {nr:"298", bez:"Prüfung von Reflexen und/oder Sensibilität",         satz1:3.50,  art:"persoenlich"},
-  infiltration:     {nr:"255", bez:"Infiltrationsbehandlung, intra-/periartikulär",      satz1:5.83,  art:"persoenlich"},
-  kryotherapie:     {nr:"200", bez:"Verödung/Kryotherapie kleiner Hautbezirk",           satz1:6.42,  art:"persoenlich"},
-  exzision:         {nr:"2401",bez:"Exzision eines Hauttumors, einfach",                 satz1:22.85, art:"persoenlich"},
-  blutbild:         {nr:"3541",bez:"Kleines Blutbild, automatisiert",                    satz1:4.08,  art:"technisch"},
-  sonoGelenk:       {nr:"418", bez:"Sonografische Untersuchung eines Gelenks",           satz1:15.61, art:"technisch"},
-  ekg:              {nr:"651", bez:"Elektrokardiografische Untersuchung (≥12 Ableitungen)",satz1:14.57,art:"technisch"},
-  echo:             {nr:"424", bez:"Echokardiografische Untersuchung",                   satz1:29.02, art:"technisch"},
-  langzeitEkg:      {nr:"652", bez:"Langzeit-EKG (mind. 18 Stunden)",                     satz1:23.29, art:"technisch"},
-  besuch:           {nr:"50",  bez:"Besuch, auch Wegepauschale",                         satz1:19.90, art:"persoenlich"},
+  beratung:        {nr:"1",   bez:"Beratung – auch mittels Fernsprecher",              satz1:4.66},
+  einBeratung:      {nr:"3",   bez:"Eingehende Beratung",                               satz1:8.74,  dauer:"mind. 10 Minuten"},
+  symptUnters:      {nr:"5",   bez:"Symptombezogene Untersuchung",                       satz1:4.66},
+  ganzkoerper:      {nr:"7",   bez:"Ganzkörperstatus",                                   satz1:9.33},
+  blutentnahme:     {nr:"250", bez:"Blutentnahme",                                       satz1:2.33},
+  reflexpruefung:   {nr:"298", bez:"Prüfung von Reflexen und/oder Sensibilität",         satz1:3.50},
+  infiltration:     {nr:"255", bez:"Infiltrationsbehandlung, intra-/periartikulär",      satz1:5.83},
+  kryotherapie:     {nr:"200", bez:"Verödung/Kryotherapie kleiner Hautbezirk",           satz1:6.42},
+  exzision:         {nr:"2401",bez:"Exzision eines Hauttumors, einfach",                 satz1:22.85},
+  blutbild:         {nr:"3541",bez:"Kleines Blutbild, automatisiert",                    satz1:4.08},
+  sonoGelenk:       {nr:"418", bez:"Sonografische Untersuchung eines Gelenks",           satz1:15.61},
+  ekg:              {nr:"651", bez:"Elektrokardiografische Untersuchung",                satz1:14.57, dauer:"mind. 12 Ableitungen"},
+  echo:             {nr:"424", bez:"Echokardiografische Untersuchung",                   satz1:29.02},
+  langzeitEkg:      {nr:"652", bez:"Langzeit-EKG",                                       satz1:23.29, dauer:"mind. 18 Stunden"},
+  besuch:           {nr:"50",  bez:"Besuch",                                             satz1:19.90},
 };
-/* Analogfähige, im Ziffernwerk nicht eigenständig gelistete Leistungen je Fachrichtung */
+/* Für Präfix „A“ (Analogleistung): tatsächlich erbrachte, nicht eigenständig gelistete Leistung je Fachrichtung */
 const ANALOG = {
-  telemedizin:      {nr:"A1",  bez:"Video-Verlaufskontrolle (telemedizinisch)",          satz1:8.74,  art:"persoenlich", basisNr:"3",  basisBez:"Eingehende Beratung"},
-  videodermatoskop: {nr:"A2",  bez:"Digitale Videodermatoskopie mehrerer Läsionen",       satz1:12.50, art:"persoenlich", basisNr:"750",basisBez:"Mikroskopische Untersuchung"},
+  telemedizin:      {basisNr:"3",  basisBez:"Eingehende Beratung",             satz1:8.74,  echt:"Video-Verlaufskontrolle (telemedizinisch)"},
+  videodermatoskop: {basisNr:"750",basisBez:"Mikroskopische Untersuchung",     satz1:12.50, echt:"Digitale Videodermatoskopie mehrerer Läsionen"},
 };
-const UNZEIT_ZUSCHLAG = {nr:"A", bez:"Zuschlag für Inanspruchnahme zu Unzeiten (22–6 Uhr bzw. Sonn-/Feiertag)", satz1:14.90, art:"persoenlich"};
 
-const SACHKOSTEN = [
-  {bez:"Einmalspritzen und Kanülen (3 Stück)", betrag:2.10},
-  {bez:"Steriles Verbandmaterial", betrag:4.80},
-  {bez:"Schnelltest-Reagenzien (1 Test)", betrag:6.90},
-  {bez:"Lokalanästhetikum, 1 Ampulle", betrag:3.40},
+const PRAEFIX_INFO = {
+  V:{label:"Verlangensleistung", ref:"§1 Abs. 2 S. 2 GOÄ", desc:"über das medizinisch notwendige Maß hinaus, nur auf ausdrückliches Verlangen berechnungsfähig"},
+  F:{label:"Früherkennung", ref:"Kap. 3.9", desc:"Leistung im Rahmen einer gesetzlichen Früherkennungs-/Vorsorgemaßnahme"},
+  E:{label:"Ersatz von Auslagen", ref:"§10 GOÄ", desc:"keine ärztliche Gebühr, sondern Ersatz tatsächlich entstandener Sachkosten"},
+  W:{label:"Wegegeld (≤ 25 km)", ref:"§8 GOÄ", desc:"Entschädigung für Besuch bis 25 km um die Praxis"},
+  R:{label:"Reiseentschädigung (> 25 km)", ref:"§9 GOÄ", desc:"tritt bei größerer Entfernung an die Stelle des Wegegelds"},
+  A:{label:"Analog nach GOÄ berechnet", ref:"§6 Abs. 2 GOÄ", desc:"eigenständige Leistung ohne eigene Nummer, abgerechnet entsprechend einer gleichwertigen Leistung"},
+};
+const FAKTORGRUND_INFO = {
+  HV:{label:"Honorarvereinbarung", desc:"vereinbarter Faktor gilt unmittelbar; keine Multiplikation mit anderen Faktor-Gründen"},
+  BT:{label:"Basistarif"},
+  ST:{label:"Standardtarif"},
+  NT:{label:"Notlagentarif"},
+  AB:{label:"Allgemeine Bestimmung/Abrechnungsbestimmung", desc:"konkrete Bestimmung ist in der Begründung zu benennen"},
+};
+const DIAGNOSE_KENNZEICHEN = {ZA:"Zum Ausschluss", G:"Gesichert", VA:"Verdacht auf", ZN:"Zustand nach"};
+
+/* §10 Abs. 1 GOÄneu: berechnungsfähige Auslagen (Arzneimittel u.ä. mit einmaligem Verbrauch) */
+const SACHKOSTEN_ERLAUBT = [
+  "Injektionslösung Ropivacain 0,5 %, 1 Ampulle (Wirkstoff Ropivacain)",
+  "Röntgenkontrastmittel Iopromid 300, 1 Durchstechflasche",
+  "Patientenindividuelle Fertigschiene (verbleibt beim Patienten)",
+  "Antibiotikum zur intramuskulären Injektion, 1 Durchstechflasche (Wirkstoff Ceftriaxon)",
 ];
-
-const BEGRUENDUNGEN = [
+/* §10 Abs. 2 GOÄneu: ausdrücklich NICHT gesondert berechnungsfähige Kosten */
+const SACHKOSTEN_UNZULAESSIG = [
+  "Einmalspritzen und -kanülen (3 Stück)",
+  "Mullkompressen und Schnellverbandmaterial",
+  "Hautdesinfektionsmittel",
+  "Einmalhandschuhe",
+];
+const BEGRUENDUNGEN_MEDIZINISCH = [
   "Erhöhter Zeitaufwand durch ausführliche Anamnese bei Mehrfacherkrankung",
   "Erschwerte Untersuchungsbedingungen durch eingeschränkte Mobilität der Patientin/des Patienten",
   "Besondere Schwierigkeit des Krankheitsbildes mit atypischer Symptomatik",
-  "Überdurchschnittlicher Aufwand durch notwendige Fremdsprachvermittlung",
 ];
+/* §8 Abs. 1 GOÄneu: Wegegeld nach Entfernungsstufe, Tag-/Nachtsatz (Nacht = 20–8 Uhr) */
+function wegegeldBetrag(km, nacht){
+  let tag;
+  if(km<=2) tag=7; else if(km<=5) tag=13; else if(km<=10) tag=20; else tag=30;
+  const nachtSatz = {7:14,13:20,20:30,30:50}[tag];
+  return nacht ? nachtSatz : tag;
+}
+/* §9 GOÄneu: Reiseentschädigung > 25 km */
+function reiseBetrag(km, abwesenheitStd){
+  const kmBetrag = round2(km*0.5);
+  const abwesenheit = abwesenheitStd>8 ? 200 : 100;
+  return round2(kmBetrag+abwesenheit);
+}
 
 const FACHRICHTUNGEN = [
   {
     name:"Allgemeinmedizin", suffix:"Hausarztpraxis",
-    diagnosen:["Akute Bronchitis (ICD-10 J20.9)","Hypertensive Herzkrankheit (ICD-10 I11.9)","Typ-2-Diabetes mellitus, entgleist (ICD-10 E11.9)"],
+    diagnosen:["Akute Bronchitis","Hypertensive Herzkrankheit","Typ-2-Diabetes mellitus, entgleist"],
+    icd:{"Akute Bronchitis":"J20.9","Hypertensive Herzkrankheit":"I11.9","Typ-2-Diabetes mellitus, entgleist":"E11.9"},
     ziffern:[Z.beratung,Z.einBeratung,Z.symptUnters,Z.ganzkoerper,Z.blutentnahme,Z.blutbild],
     analog: ANALOG.telemedizin,
   },
   {
     name:"Orthopädie", suffix:"Praxis für Orthopädie",
-    diagnosen:["Lumbalgie (ICD-10 M54.5)","Gonarthrose rechts (ICD-10 M17.1)","Rotatorenmanschettenruptur links (ICD-10 M75.1)"],
+    diagnosen:["Lumbalgie","Gonarthrose rechts","Rotatorenmanschettenruptur links"],
+    icd:{"Lumbalgie":"M54.5","Gonarthrose rechts":"M17.1","Rotatorenmanschettenruptur links":"M75.1"},
     ziffern:[Z.beratung,Z.symptUnters,Z.reflexpruefung,Z.sonoGelenk,Z.infiltration,Z.kryotherapie],
     analog: ANALOG.telemedizin,
   },
   {
     name:"Kardiologie", suffix:"Kardiologische Gemeinschaftspraxis",
-    diagnosen:["Vorhofflimmern, persistierend (ICD-10 I48.1)","Koronare Herzkrankheit, Ein-Gefäß-Erkrankung (ICD-10 I25.11)","Belastungsdyspnoe, unklarer Genese (ICD-10 R06.0)"],
+    diagnosen:["Vorhofflimmern, persistierend","Koronare Herzkrankheit, Ein-Gefäß-Erkrankung","Belastungsdyspnoe, unklarer Genese"],
+    icd:{"Vorhofflimmern, persistierend":"I48.1","Koronare Herzkrankheit, Ein-Gefäß-Erkrankung":"I25.11","Belastungsdyspnoe, unklarer Genese":"R06.0"},
     ziffern:[Z.einBeratung,Z.ganzkoerper,Z.ekg,Z.echo,Z.langzeitEkg,Z.blutentnahme],
     analog: ANALOG.telemedizin,
   },
   {
     name:"Dermatologie", suffix:"Hautarztpraxis",
-    diagnosen:["Atopisches Ekzem (ICD-10 L20.9)","Aktinische Keratose, multipel (ICD-10 L57.0)","Verdacht auf malignes Melanom (ICD-10 D48.5)"],
+    diagnosen:["Atopisches Ekzem","Aktinische Keratose, multipel","Verdacht auf malignes Melanom"],
+    icd:{"Atopisches Ekzem":"L20.9","Aktinische Keratose, multipel":"L57.0","Verdacht auf malignes Melanom":"D48.5"},
     ziffern:[Z.beratung,Z.symptUnters,Z.kryotherapie,Z.exzision,Z.blutentnahme],
     analog: ANALOG.videodermatoskop,
   },
 ];
 
 /* ========================= Beleg-Generierung ========================= */
-function generatePatient(){
+function generatePerson(){
   const isM = Math.random()<0.5;
   const vor = isM ? pick(VORNAMEN_M) : pick(VORNAMEN_F);
   const nach = pick(NACHNAMEN);
-  const geb = new Date(randInt(1948,2001), randInt(0,11), randInt(1,28));
   const ort = pick(ORTE);
   return {
-    name: vor+" "+nach,
-    geboren: geb,
-    strasse: pick(STRASSEN)+" "+randInt(2,180),
-    plz: ort.plz, ort: ort.ort,
-    versNr: "PV-"+randInt(100000,999999),
+    anrede: isM?"Herr":"Frau", vorname:vor, nachname:nach,
+    strasse: pick(STRASSEN)+" "+randInt(2,180), plz: ort.plz, ort: ort.ort,
   };
+}
+function generatePatient(){
+  const p = generatePerson();
+  p.geboren = new Date(randInt(1948,2001), randInt(0,11), randInt(1,28));
+  return p;
 }
 function generateArzt(fach){
-  const isM = Math.random()<0.5;
-  const vor = isM ? pick(VORNAMEN_M) : pick(VORNAMEN_F);
-  const nach = pick(NACHNAMEN.filter(n=>true));
+  const p = generatePerson();
   const ort = pick(ORTE);
   return {
-    name: "Dr. med. "+vor+" "+nach,
-    fach: fach.name,
-    praxis: fach.suffix+" "+nach,
-    strasse: pick(STRASSEN)+" "+randInt(1,60),
-    plz: ort.plz, ort: ort.ort,
+    anrede:p.anrede, titel:"Dr. med.", vorname:p.vorname, nachname:p.nachname,
+    fach: fach.name, praxis: fach.suffix+" "+p.nachname,
+    bsnr: String(randInt(10000000,99999999)),
+    lanr: String(randInt(100000000,999999999)),
+    strasse: pick(STRASSEN)+" "+randInt(1,60), plz: ort.plz, ort: ort.ort,
     iban: "DE"+randInt(10,99)+" "+randInt(1000,9999)+" "+randInt(1000,9999)+" "+randInt(1000,9999)+" "+randInt(1000,9999)+" "+randInt(10,99),
-    steuerNr: randInt(10,39)+"/"+randInt(100,999)+"/"+randInt(10000,99999),
   };
 }
 
-function schwellenwert(art){ return art==="persoenlich" ? 2.3 : 1.8; }
-function hoechstsatz(art){ return art==="persoenlich" ? 3.5 : 2.5; }
-
-function makeLeistung(z, opts){
+function makeVergPos(z, opts){
   opts = opts||{};
-  const art = z.art;
-  const s = schwellenwert(art);
-  const faktorOptions = art==="persoenlich" ? [1.0,1.8,2.0,2.3] : [1.0,1.15,1.3,1.8];
-  const faktor = opts.faktor!==undefined ? opts.faktor : pick(faktorOptions);
+  /* § 5 GOÄneu: fester Gebührensatz je Ziffer — Faktor ist Regelfall 1,0, Abweichung nur mit Faktor-Grund (HV/AB/BT/ST/NT) */
+  const faktor = opts.faktor!==undefined ? opts.faktor : 1.0;
   const betrag = round2(z.satz1*faktor);
   return {
     id: Math.random().toString(36).slice(2,9),
-    nr: z.nr, bez: z.bez, satz1: z.satz1, art, faktor, betrag,
-    schwellenwert: s,
-    begruendung: opts.begruendung!==undefined ? opts.begruendung : (faktor>s ? pick(BEGRUENDUNGEN) : null),
-    analog: !!opts.analog,
-    analogBasisNr: opts.analogBasisNr||null,
-    analogBasisBez: opts.analogBasisBez||null,
-    analogLabelMissing: !!opts.analogLabelMissing,
-    sachkosten: opts.sachkosten||null,
-    sachkostenPauschal: !!opts.sachkostenPauschal,
+    kind:"leistung",
+    anzahl: 1,
+    praefixe: opts.praefixe || [],
+    goaeNr: z.nr, titel: z.bez, dauer: z.dauer||null,
+    begruendung: opts.begruendung!==undefined ? opts.begruendung : null,
+    faktorGrund: opts.faktorGrund || [],
+    faktor, betrag,
+    arztNr: 1,
     flags: [],
+  };
+}
+function makeSachkostenPos(opts){
+  opts = opts||{};
+  const unzulaessig = !!opts.unzulaessig;
+  const bez = opts.bezeichnung || pick(unzulaessig ? SACHKOSTEN_UNZULAESSIG : SACHKOSTEN_ERLAUBT);
+  const betrag = opts.betrag!==undefined ? opts.betrag : round2(2+Math.random()*8);
+  return {
+    id: Math.random().toString(36).slice(2,9), kind:"sachkosten",
+    anzahl:1, praefixe:["E"], goaeNr:"", titel:"Ersatz von Auslagen", dauer:null,
+    begruendung: opts.begruendung!==undefined ? opts.begruendung : bez,
+    faktorGrund:[], faktor:null, betrag, arztNr:1, flags:[],
+  };
+}
+function makeWegegeldPos(opts){
+  opts = opts||{};
+  const praefix = opts.praefix || "W";
+  const km = opts.km!==undefined ? opts.km : randInt(1,20);
+  const nacht = !!opts.nacht;
+  let betrag, begruendung;
+  if(praefix==="W"){
+    betrag = wegegeldBetrag(km, nacht);
+    begruendung = "Entfernung "+km+" km"+(nacht?", Nachtbesuch (20–8 Uhr)":"")+" (§ 8 GOÄneu)";
+  } else {
+    const abwesenheit = opts.abwesenheitStd!==undefined ? opts.abwesenheitStd : 2;
+    betrag = reiseBetrag(km, abwesenheit);
+    begruendung = "Entfernung "+km+" km, Pkw (0,50 €/km), Abwesenheit "+abwesenheit+" Std. (§ 9 GOÄneu)";
+  }
+  return {
+    id: Math.random().toString(36).slice(2,9), kind:"wegegeld",
+    anzahl:1, praefixe:[praefix], goaeNr:"", titel: praefix==="W" ? "Wegegeld" : "Reiseentschädigung", dauer:null,
+    begruendung: opts.begruendung!==undefined ? opts.begruendung : begruendung,
+    faktorGrund:[], faktor:null, betrag: opts.betrag!==undefined?opts.betrag:betrag, arztNr:1, flags:[],
+  };
+}
+function makeAnalogPos(a, opts){
+  opts = opts||{};
+  const faktor = opts.faktor!==undefined ? opts.faktor : 2.3;
+  const betrag = round2(a.satz1*faktor);
+  return {
+    id: Math.random().toString(36).slice(2,9), kind:"analog",
+    anzahl:1, praefixe:["A"], goaeNr: a.basisNr, titel: a.basisBez, dauer:null,
+    begruendung: opts.begruendung!==undefined ? opts.begruendung : ((opts.analogPrefix!==false?"Analog: ":"")+a.echt),
+    faktorGrund: opts.faktorGrund||[], faktor, betrag, arztNr:1, flags:[],
   };
 }
 
@@ -498,31 +611,35 @@ function generateBeleg(){
   const fach = pick(FACHRICHTUNGEN);
   const arzt = generateArzt(fach);
   const patient = generatePatient();
-  const diagnose = pick(fach.diagnosen);
+  const diagnoseName = pick(fach.diagnosen);
 
   const heute = new Date();
   const leistungsdatum = addDays(heute, -randInt(1,9));
   const rechnungsdatum = addDays(leistungsdatum, randInt(1,6));
 
   const gewaehlt = pickN(fach.ziffern, randInt(2,3));
-  const leistungen = gewaehlt.map(z=>makeLeistung(z));
+  const positionen = gewaehlt.map(z=>makeVergPos(z));
 
-  if(Math.random()<0.35){
-    const sk = pick(SACHKOSTEN);
-    leistungen[0].sachkosten = sk;
-  }
+  if(Math.random()<0.35){ positionen.push(makeSachkostenPos({unzulaessig:false})); }
 
   const rechnungsnummer = "RG-"+heute.getFullYear()+"-"+randInt(10000,99999);
+  const abrechnungsstelle = Math.random()<0.4;
 
   return {
     id: rechnungsnummer,
-    fach, arzt, patient, diagnose,
+    fach, arzt, patient,
+    empfaenger: null, // null = identisch mit Patient
+    verantwortlicheAerzte: [{lfdNr:1, anrede:arzt.anrede, titel:arzt.titel, name:arzt.vorname+" "+arzt.nachname, lanr:arzt.lanr}],
+    diagnose: { text: diagnoseName, icd: fach.icd[diagnoseName], kennzeichen:null, entfaellt:false, entfaelltGrund:null },
     leistungsdatum, rechnungsdatum,
-    zeit: null,
-    notfall:false,
-    leistungen,
+    positionen,
+    minderung: null, // {prozent, betrag}
+    ustSatz: null,
+    weitereAngaben: null,
+    abrechnungsstelle,
     layout: pick(["a","b","c"]),
     kategorie: "korrekt",
+    summenFehler: 0,
   };
 }
 
@@ -530,15 +647,22 @@ function cloneBeleg(b){
   const c = JSON.parse(JSON.stringify(b));
   c.leistungsdatum = new Date(b.leistungsdatum);
   c.rechnungsdatum = new Date(b.rechnungsdatum);
-  c.zeit = b.zeit ? new Date(b.zeit) : null;
-  c.fach = b.fach; // Referenz reicht, wird nicht mutiert
+  c.fach = b.fach;
   return c;
 }
 
-function summe(b){
-  let s = 0;
-  b.leistungen.forEach(l=>{ s += l.betrag; if(l.sachkosten) s += l.sachkosten.betrag; });
-  return round2(s);
+function summen(b){
+  let vergSum = 0, sachkosten = 0, wegegeld = 0;
+  b.positionen.forEach(p=>{
+    if(p.kind==="sachkosten") sachkosten += p.betrag;
+    else if(p.kind==="wegegeld") wegegeld += p.betrag;
+    else vergSum += p.betrag;
+  });
+  const minderung = b.minderung ? round2(vergSum*b.minderung.prozent/100) : 0;
+  const nachMinderung = round2(vergSum - minderung);
+  const ust = b.ustSatz ? round2(nachMinderung*b.ustSatz/100) : 0;
+  const gesamt = round2(nachMinderung + ust + sachkosten + wegegeld);
+  return {vergSum:round2(vergSum), sachkosten:round2(sachkosten), wegegeld:round2(wegegeld), minderung, nachMinderung, ust, gesamt};
 }
 
 /* ========================= Kategorie-Logik ========================= */
@@ -549,96 +673,106 @@ const ICONS = {
   exception: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6l-8-4Z"/><path d="M12 8v5M12 15.5h.01"/></svg>',
   conflict: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7 3 12l5 5M16 7l5 5-5 5M14 4 10 20"/></svg>',
 };
-
 const CATEGORY_META = {
-  korrekt:  {label:"Korrekter Fall",  desc:"Alle Rechnungsinhalte vollständig und regelkonform.", icon:ICONS.ok,        colorVar:"--cat-ok",        bgVar:"--cat-ok-bg"},
-  grenzfall:{label:"Grenzfall",       desc:"An der definierten Auslegungsgrenze, z. B. Schwellenwert.", icon:ICONS.boundary, colorVar:"--cat-boundary",  bgVar:"--cat-boundary-bg"},
-  verstoss: {label:"Verstoß",        desc:"Gezielte Verletzung einer Inhalts-/Formvorgabe.", icon:ICONS.violation,  colorVar:"--cat-violation", bgVar:"--cat-violation-bg"},
-  ausnahme: {label:"Ausnahmefall",    desc:"Z. B. Notfallbehandlung außerhalb der Regelversorgung.", icon:ICONS.exception, colorVar:"--cat-exception", bgVar:"--cat-exception-bg"},
-  konflikt: {label:"Konfliktfall",    desc:"Parallele bzw. überlappende Regeln widersprechen sich.", icon:ICONS.conflict, colorVar:"--cat-conflict",  bgVar:"--cat-conflict-bg"},
+  korrekt:  {label:"Korrekter Fall",  desc:"Alle Rechnungsinhalte vollständig und formularkonform.", icon:ICONS.ok,        colorVar:"--cat-ok",        bgVar:"--cat-ok-bg"},
+  grenzfall:{label:"Grenzfall",       desc:"An der definierten Auslegungsgrenze des Formulars.", icon:ICONS.boundary, colorVar:"--cat-boundary",  bgVar:"--cat-boundary-bg"},
+  verstoss: {label:"Verstoß",        desc:"Gezielte Verletzung einer Pflicht- bzw. ggf.-Pflichtangabe.", icon:ICONS.violation,  colorVar:"--cat-violation", bgVar:"--cat-violation-bg"},
+  ausnahme: {label:"Ausnahmefall",    desc:"Im Formular selbst vorgesehene Abweichung vom Regelfall.", icon:ICONS.exception, colorVar:"--cat-exception", bgVar:"--cat-exception-bg"},
+  konflikt: {label:"Konfliktfall",    desc:"Widersprüchliche Kombination von Präfixen bzw. Feldern.", icon:ICONS.conflict, colorVar:"--cat-conflict",  bgVar:"--cat-conflict-bg"},
 };
 
-function addFlag(l, type, rule, text){ l.flags.push({type, rule, text}); }
+function addFlag(p, type, rule, text){ p.flags.push({type, rule, text}); }
 
 function applyKorrekt(b){
   const pp = [];
-  b.leistungen.forEach(l=>{
-    if(l.faktor>l.schwellenwert){
-      pp.push({status:"ok", rule:"§12 Abs. 3 GOÄ", title:"Begründung bei Schwellenwert-Überschreitung", detail:"Ziffer "+l.nr+" ("+l.faktor.toFixed(1)+"-facher Satz) trägt eine nachvollziehbare, patientenverständliche Begründung."});
-    }
-  });
-  pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 6 GOÄ", title:"Diagnoseangabe vorhanden", detail:"Der Behandlungsanlass „"+b.diagnose+"“ ist eindeutig benannt."});
-  pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 1–2 GOÄ", title:"Leistungsdatum, Ziffer und Bezeichnung vollständig", detail:"Für jede Position sind Erbringungsdatum, GOÄ-Nummer, Bezeichnung, Satz und Betrag ausgewiesen."});
-  pp.push({status:"ok", rule:"Rechnerische Richtigkeit", title:"Summenbildung korrekt", detail:"Die ausgewiesene Gesamtsumme entspricht der Summe der Einzelpositionen inkl. Sachkosten."});
+  pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 1 GOÄneu", title:"Diagnose vollständig angegeben", detail:"„"+b.diagnose.text+"“ (ICD-10 "+b.diagnose.icd+") ist als behandlungsrelevante Diagnose benannt."});
+  pp.push({status:"ok", rule:"§5 GOÄneu / §12 Abs. 2 Nr. 3–4", title:"Fester Gebührensatz ohne Faktor-Abweichung", detail:"Jede Position trägt den vollen Eurobetrag aus dem Gebührenverzeichnis zum Faktor 1,0 — GOÄneu kennt keinen Steigerungsfaktor mehr; ein Faktor-Grund (HV/AB/BT/ST/NT) ist hier nicht einschlägig und folgerichtig auch nicht gesetzt."});
+  pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 3 GOÄneu", title:"Nummer, Anzahl und Titel der Leistungslegende vollständig", detail:"Für jede Position sind GOÄ-Nummer, Anzahl und ein patientenverständlicher Titel ausgewiesen."});
+  pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 2 / Kap. 3.13", title:"Summenbildung und Schlussvermerk korrekt", detail:"Der Gesamtrechnungsbetrag entspricht der Summe der Einzelpositionen; der vorgeschriebene Schlussvermerk ist vorhanden."});
   return {pp, outcome:"Erwartetes Systemverhalten: Beleg wird ohne Beanstandung zur Erstattung angenommen."};
 }
 
 function applyGrenzfall(b){
   const pp = [];
-  const subtype = pick(["schwelle_exakt","analog_neu","begruendung_knapp","unzeit_grenze"]);
-  if(subtype==="schwelle_exakt"){
-    const l = pick(b.leistungen);
-    l.faktor = l.schwellenwert;
-    l.betrag = round2(l.satz1*l.faktor);
-    l.begruendung = null;
-    addFlag(l,"boundary","§12 Abs. 3 GOÄ","Faktor exakt auf dem Schwellenwert — Begründungspflicht gilt erst bei Überschreiten.");
-    pp.push({status:"boundary", rule:"§12 Abs. 3 GOÄ", title:"Schwellenwert exakt erreicht ("+l.faktor.toFixed(1)+"-fach)", detail:"Ziffer "+l.nr+" wird mit genau dem "+l.faktor.toFixed(1)+"-fachen Satz abgerechnet. Eine Begründung ist rechtlich nur bei Überschreiten des Schwellenwerts vorgeschrieben — die Testfrage ist, ob eine Prüflogik „exakt = Schwelle“ korrekt von „> Schwelle“ unterscheidet."});
-  } else if(subtype==="analog_neu"){
+  const subtype = pick(["hv_wahlleistung","analog_kapitel_m","wegegeld_25km","nachtbesuch_grenze","minderung_rolle","verdachtsdiagnose"]);
+  if(subtype==="hv_wahlleistung"){
+    const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
+    p.faktorGrund = ["HV"];
+    p.faktor = 2.1;
+    p.betrag = round2((Z[Object.keys(Z).find(k=>Z[k].nr===p.goaeNr)]||{satz1:p.betrag}).satz1 * p.faktor);
+    p.begruendung = "Honorarvereinbarung vom "+fmtDate(addDays(b.leistungsdatum,-2))+": Nr. "+p.goaeNr+" „"+p.titel+"“, Faktor 2,1, vereinbarter Betrag "+euro(p.betrag)+", Hinweis auf ggf. nicht vollständige Kostenerstattung erteilt.";
+    addFlag(p,"boundary","§2 Abs. 1 S. 3 GOÄneu","Honorarvereinbarung bei wahlärztlicher Leistung — zulässig nur, wenn die Leistung vom Wahlarzt höchstpersönlich erbracht wurde.");
+    pp.push({status:"boundary", rule:"§2 Abs. 1 S. 3 GOÄneu", title:"Honorarvereinbarung bei (vermutet) wahlärztlicher Leistung", detail:"Bei vollstationären u.ä. wahlärztlichen Leistungen ist eine Honorarvereinbarung „nur für vom Wahlarzt höchstpersönlich erbrachte Leistungen zulässig“. Die Vereinbarung selbst enthält alle Pflichtangaben nach §2 Abs.2 — ob die persönliche Erbringung durch den Wahlarzt vorlag, ist dem Beleg allein aber nicht anzusehen."});
+  } else if(subtype==="analog_kapitel_m"){
     const a = b.fach.analog;
-    const nl = makeLeistung(a, {faktor: a.art==="persoenlich"?2.3:1.8, analog:true, analogBasisNr:a.basisNr, analogBasisBez:a.basisBez});
-    addFlag(nl,"boundary","§6 Abs. 2 GOÄ","Analogbewertung korrekt gekennzeichnet, Gleichwertigkeit der Basisleistung aber auslegungsbedürftig.");
-    b.leistungen.push(nl);
-    pp.push({status:"boundary", rule:"§6 Abs. 2 GOÄ", title:"Analogberechnung einer nicht gelisteten Leistung", detail:"„"+nl.bez+"“ wird analog zu Nr. "+a.basisNr+" ("+a.basisBez+") mit dem Hinweis „Analog-Berechnung“ abgerechnet. Formal vollständig — ob die herangezogene Basisleistung tatsächlich „gleichwertig“ ist, bleibt fachlich auslegungsbedürftig."});
-  } else if(subtype==="begruendung_knapp"){
-    const kandidaten = b.leistungen.filter(l=>l.faktor>l.schwellenwert);
-    const l = kandidaten.length ? pick(kandidaten) : (function(){ const x=pick(b.leistungen); x.faktor=hoechstsatz(x.art); x.betrag=round2(x.satz1*x.faktor); return x; })();
-    l.begruendung = "Erhöhter Aufwand.";
-    addFlag(l,"boundary","§12 Abs. 3 Satz 2 GOÄ","Begründung vorhanden, aber sehr knapp formuliert — Nachvollziehbarkeit für Laien fraglich.");
-    pp.push({status:"boundary", rule:"§12 Abs. 3 Satz 2 GOÄ", title:"Begründung formal vorhanden, aber knapp", detail:"Für Ziffer "+l.nr+" liegt eine Begründung vor („"+l.begruendung+"“). Das Gesetz verlangt eine „für den Zahlungspflichtigen verständliche und nachvollziehbare“ Begründung — ob drei Worte diesem Maßstab genügen, ist eine Auslegungsfrage."});
+    const nl = makeAnalogPos(a, {faktor:1.0});
+    addFlag(nl,"boundary","§6 Abs. 2 S. 2 GOÄneu","Analogleistung korrekt mit Präfix „A“ gekennzeichnet; die vorherige Textform-Information des Patienten ist Pflicht — außer bei Labor-Analogabrechnung nach Kapitel M I.");
+    b.positionen.push(nl);
+    pp.push({status:"boundary", rule:"§6 Abs. 2 GOÄneu", title:"Analogberechnung — Informationspflicht auslegungsbedürftig", detail:"„"+a.echt+"“ wird mit Präfix „A“ entsprechend Nr. "+a.basisNr+" („"+a.basisBez+"“) abgerechnet. §6 Abs.2 S.2 verlangt grundsätzlich eine vorherige Textform-Information des Patienten; für laboratoriumsdiagnostische Analogleistungen nach Abschnitt M I gilt hiervon eine Ausnahme. Ob diese Ausnahme hier greift, hängt von der genauen Leistungsart ab."});
+  } else if(subtype==="wegegeld_25km"){
+    const w = makeWegegeldPos({praefix:"W", km:25});
+    addFlag(w,"boundary","§8/§9 GOÄneu","Entfernung liegt exakt auf der Grenze zwischen Wegegeld (bis 25 km) und Reiseentschädigung (über 25 km).");
+    b.positionen.push(w);
+    pp.push({status:"boundary", rule:"§8 Abs. 1 Nr. 4 / §9 Abs. 1 GOÄneu", title:"Entfernung exakt auf der 25-km-Grenze", detail:"§8 GOÄneu erfasst Wegegeld ausdrücklich bis 25 km (hier: 30,00 €), §9 GOÄneu Reiseentschädigung erst „über eine Entfernung von mehr als 25 Kilometern“. Bei exakt 25 km ist nach dem Wortlaut noch Wegegeld einschlägig — ein Randfall, an dem eine automatisierte Prüfung leicht das falsche Präfix ansetzt."});
+  } else if(subtype==="nachtbesuch_grenze"){
+    const w = makeWegegeldPos({praefix:"W", km:4, nacht:true});
+    addFlag(w,"boundary","§8 Abs. 1 GOÄneu","Besuchszeit exakt auf der Grenze des Nachtzeitraums (20–8 Uhr) — entscheidet über einfachen oder Nachtsatz.");
+    b.positionen.push(w);
+    pp.push({status:"boundary", rule:"§8 Abs. 1 GOÄneu", title:"Besuchszeit exakt auf der Nachtsatz-Grenze", detail:"Der Nachtsatz gilt „zwischen 20 und 8 Uhr“. Ist der Besuch für exakt 20:00 Uhr dokumentiert, hängt die Anwendung des höheren Nachtsatzes (hier 20,00 € statt 13,00 €) davon ab, ob die Grenze inklusiv oder exklusiv ausgelegt wird."});
+  } else if(subtype==="minderung_rolle"){
+    b.minderung = {prozent: 15, arztRolle:"Beleg-/niedergelassener Arzt (§6a Abs. 1 S. 2 GOÄneu)"};
+    addFlag(b.positionen[0],"boundary","§6a Abs. 1 GOÄneu","Minderungssatz 15 % nur korrekt, wenn tatsächlich ein Beleg- bzw. niedergelassener Arzt und kein Krankenhausarzt abrechnet.");
+    pp.push({status:"boundary", rule:"§6a Abs. 1 S. 1–2 GOÄneu", title:"Minderungssatz hängt an der Arztrolle", detail:"§6a GOÄneu sieht 25 % Minderung bei Krankenhausärzten vor, aber nur 15 % „für Leistungen … von Belegärzten oder niedergelassenen anderen Ärzten“. Der Beleg weist 15 % aus — plausibel nur, wenn die Arztrolle im Einzelfall eindeutig als Beleg-/niedergelassener Arzt und nicht als angestellter Krankenhausarzt zu werten ist."});
   } else {
-    b.notfall = true;
-    const grund = b.leistungen[0] || makeLeistung(Z.beratung);
-    if(!b.leistungen.includes(grund)) b.leistungen.unshift(grund);
-    const zeit = new Date(b.leistungsdatum); zeit.setHours(22,0,0,0);
-    b.zeit = zeit;
-    const zu = makeLeistung(UNZEIT_ZUSCHLAG,{faktor:1.0, begruendung:null});
-    addFlag(zu,"boundary","Zuschlagsregelung Unzeit","Uhrzeit liegt exakt auf der Grenze des Unzeit-Zeitfensters (22:00 Uhr).");
-    b.leistungen.push(zu);
-    pp.push({status:"boundary", rule:"Zuschlagsregelung Unzeit (Abschnitt B)", title:"Behandlungszeit exakt auf Zuschlags-Zeitgrenze", detail:"Die dokumentierte Uhrzeit ("+fmtTime(zeit)+") liegt exakt auf der Grenze des Zeitfensters für den Unzeit-Zuschlag. Je nachdem, ob die Grenze inklusiv oder exklusiv ausgelegt wird, ist der Zuschlag berechnungsfähig oder nicht."});
+    b.diagnose.kennzeichen = "VA";
+    addFlag(b.positionen[0],"boundary","§12 Abs. 2 Nr. 1 GOÄneu","Verdachtsdiagnose (VA) kurz vor der eigentlichen Befundabklärung — laut Gesetz nur bis dahin zulässig.");
+    pp.push({status:"boundary", rule:"§12 Abs. 2 Nr. 1 GOÄneu", title:"Verdachtsdiagnose an der Abklärungsgrenze", detail:"„"+b.diagnose.text+"“ trägt das Zusatzkennzeichen „VA“ (Verdacht auf). Laut Gesetz sind „Verdachts- und vorläufige Diagnosen … nur bis zur Befundabklärung aufzuführen“ — der Beleg liegt hier an genau dieser zeitlichen Grenze."});
   }
-  return {pp, outcome:"Erwartetes Systemverhalten: formal regelkonform, aber auslegungsbedürftig — zur manuellen Prüfung markieren, nicht automatisiert ablehnen."};
+  return {pp, outcome:"Erwartetes Systemverhalten: gesetzlich zulässig, aber auslegungsbedürftig — zur manuellen Prüfung markieren, nicht automatisiert ablehnen."};
 }
 
 function applyVerstoss(b){
   const pp = [];
-  const pool = ["faktor_ohne_begruendung","analog_ohne_kennzeichnung","diagnose_fehlt","rechenfehler","sachkosten_pauschal"];
+  const pool = ["titel_fehlt","analog_ohne_praefix","diagnose_fehlt_unbegruendet","ab_ohne_konkretisierung","rechenfehler","sachkosten_unzulaessig","hv_verbotenes_kapitel"];
   const subtypes = pickN(pool, randInt(1,2));
   subtypes.forEach(subtype=>{
-    if(subtype==="faktor_ohne_begruendung"){
-      const l = pick(b.leistungen);
-      l.faktor = hoechstsatz(l.art);
-      l.betrag = round2(l.satz1*l.faktor);
-      l.begruendung = null;
-      addFlag(l,"violation","§12 Abs. 3 GOÄ","Schwellenwert überschritten, aber keine Begründung angegeben.");
-      pp.push({status:"violation", rule:"§12 Abs. 3 GOÄ", title:"Fehlende Begründung bei Schwellenwert-Überschreitung", detail:"Ziffer "+l.nr+" wird mit dem "+l.faktor.toFixed(1)+"-fachen Satz (Höchstsatz) abgerechnet, ohne die gesetzlich vorgeschriebene Begründung. Die Rechnung ist in diesem Punkt nicht erstattungsfähig."});
-    } else if(subtype==="analog_ohne_kennzeichnung"){
+    if(subtype==="titel_fehlt"){
+      const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
+      p.titel = "";
+      addFlag(p,"violation","§12 Abs. 2 Nr. 3 GOÄneu","Titel der Leistungslegende/Kurzbezeichnung fehlt — Pflichtangabe.");
+      pp.push({status:"violation", rule:"§12 Abs. 2 Nr. 3 GOÄneu", title:"Titel der Leistungslegende fehlt", detail:"Zu GOÄ-Nr. "+p.goaeNr+" fehlt der für den Patienten verständliche Titel bzw. die Kurzbezeichnung der Leistung. Das Gesetz verlangt „bei Leistungen deren Nummer, die Anzahl und den Titel der Leistungslegende“."});
+    } else if(subtype==="analog_ohne_praefix"){
       const a = b.fach.analog;
-      const nl = makeLeistung(a, {faktor:2.3, analog:true, analogBasisNr:a.basisNr, analogBasisBez:a.basisBez, analogLabelMissing:true});
-      addFlag(nl,"violation","§12 Abs. 2 Nr. 2 GOÄ / §6 Abs. 2 GOÄ","Analogziffer ohne Kennzeichnung „Analog-Berechnung“ und ohne Nennung der Basisleistung.");
-      b.leistungen.push(nl);
-      pp.push({status:"violation", rule:"§12 Abs. 2 Nr. 2 GOÄ", title:"Analogleistung nicht als solche gekennzeichnet", detail:"„"+nl.bez+"“ wird zum "+nl.faktor.toFixed(1)+"-fachen Satz abgerechnet, ohne Hinweis „Analog-Berechnung“ und ohne Nennung der herangezogenen Basisleistung Nr. "+a.basisNr+". Für die versicherte Person ist nicht nachvollziehbar, worauf die Bewertung beruht."});
-    } else if(subtype==="diagnose_fehlt"){
-      b.diagnose = "";
+      const nl = makeAnalogPos(a, {faktor:1.0, analogPrefix:false});
+      nl.praefixe = [];
+      addFlag(nl,"violation","§12 Abs. 4 Nr. 6 / Abs. 5 GOÄneu","Analog erbrachte Leistung ohne Präfix „A“ abgerechnet — Nummer und Bezeichnung der als gleichwertig erachteten Leistung fehlen der Kennzeichnung.");
+      b.positionen.push(nl);
+      pp.push({status:"violation", rule:"§12 Abs. 4 Nr. 6 / Abs. 5 GOÄneu", title:"Analogleistung nicht als solche gekennzeichnet", detail:"„"+a.echt+"“ wird über Nr. "+a.basisNr+" abgerechnet, ohne das Präfix „A“ zu setzen. §12 Abs.5 verlangt, dass die entsprechend bewertete Leistung „für den Zahlungspflichtigen verständlich“ sowie Nummer und Bezeichnung der als gleichwertig erachteten Leistung angegeben werden."});
+    } else if(subtype==="diagnose_fehlt_unbegruendet"){
+      b.diagnose.text = ""; b.diagnose.icd = ""; b.diagnose.entfaellt = false; b.diagnose.entfaelltGrund = null;
       b.diagnoseFlag = true;
-      pp.push({status:"violation", rule:"§12 Abs. 2 Nr. 6 GOÄ", title:"Diagnose-/Behandlungsanlassangabe fehlt", detail:"Der Beleg enthält keine Angabe zur Erkrankung. Ohne Diagnoseangabe ist die medizinische Notwendigkeit der abgerechneten Leistungen nicht prüfbar."});
+      pp.push({status:"violation", rule:"§12 Abs. 2 Nr. 1 GOÄneu (Pflichtangabe)", title:"Diagnoseangabe fehlt ohne erkennbaren Ausnahmegrund", detail:"Der Beleg enthält weder ICD-Code noch Klartext-Diagnose. Anders als beim Ausnahmefall „schutzwürdige Interessen“ ist hier kein Grund für das Entfallen dokumentiert — die Leistungen sind medizinisch nicht nachvollziehbar."});
+    } else if(subtype==="ab_ohne_konkretisierung"){
+      const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
+      p.faktorGrund = ["AB"]; p.faktor = 1.5; p.betrag = round2((Z[Object.keys(Z).find(k=>Z[k].nr===p.goaeNr)]||{satz1:p.betrag}).satz1*1.5);
+      p.begruendung = "Erhöhter Aufwand.";
+      addFlag(p,"violation","Kap. 3.9 Faktor-Grund „AB“","Faktor-Grund „AB“ gesetzt, aber die konkrete Allgemeine Bestimmung wird in der Begründung nicht benannt.");
+      pp.push({status:"violation", rule:"Kap. 3.9 Faktor-Grund „AB“", title:"Abrechnungsbestimmung nicht konkretisiert", detail:"Bei Faktor-Grund „AB“ verlangt das Rechnungsformular ausdrücklich, dass „die konkrete Allgemeine Bestimmung oder Abrechnungsbestimmung … in der Begründung anzugeben“ ist. Hier steht nur „Erhöhter Aufwand.“ — das erfüllt die Vorgabe nicht."});
     } else if(subtype==="rechenfehler"){
       b.summenFehler = round2(randInt(3,18) + Math.random());
-      pp.push({status:"violation", rule:"Rechnerische Sorgfaltspflicht", title:"Gesamtsumme stimmt nicht mit Einzelpositionen überein", detail:"Die ausgewiesene Gesamtsumme weicht von der Summe der Einzelpositionen um "+euro(b.summenFehler)+" ab."});
-    } else if(subtype==="sachkosten_pauschal"){
-      if(!b.leistungen[0].sachkosten){ b.leistungen[0].sachkosten = pick(SACHKOSTEN); }
-      b.leistungen[0].sachkostenPauschal = true;
-      addFlag(b.leistungen[0],"violation","§10 GOÄ","Sachkosten pauschal statt nach Art und Menge ausgewiesen.");
-      pp.push({status:"violation", rule:"§10 GOÄ", title:"Sachkosten ohne Einzelaufstellung", detail:"Sachkosten werden als „Pauschale“ ausgewiesen statt, wie vorgeschrieben, einzeln nach Art und Menge aufgeschlüsselt."});
+      pp.push({status:"violation", rule:"§12 Abs. 2 Nr. 2 GOÄneu / Tabellenfuß", title:"Gesamtrechnungsbetrag stimmt nicht mit den Einzelpositionen überein", detail:"Der ausgewiesene Gesamtrechnungsbetrag weicht von der rechnerisch korrekten Summe der Einzelpositionen um "+euro(b.summenFehler)+" ab."});
+    } else if(subtype==="sachkosten_unzulaessig"){
+      let sk = b.positionen.find(p=>p.kind==="sachkosten");
+      if(!sk){ sk = makeSachkostenPos({unzulaessig:true}); b.positionen.push(sk); }
+      else { sk.begruendung = pick(SACHKOSTEN_UNZULAESSIG); }
+      addFlag(sk,"violation","§10 Abs. 2 GOÄneu","Diese Auslage ist im Gesetz ausdrücklich von der gesonderten Berechnung ausgeschlossen.");
+      pp.push({status:"violation", rule:"§10 Abs. 2 GOÄneu", title:"Nicht berechnungsfähige Auslage abgerechnet", detail:"„"+sk.begruendung+"“ steht wortgleich auf der Ausschlussliste des §10 Abs.2 GOÄneu (u. a. Einmalspritzen, -kanülen, -handschuhe, Schnellverbandmaterial, Desinfektionsmittel). Diese Kosten sind mit der Gebühr bereits abgegolten und dürfen nicht gesondert als Auslage (Präfix „E“) berechnet werden."});
+    } else if(subtype==="hv_verbotenes_kapitel"){
+      const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
+      p.faktorGrund = ["HV"]; p.faktor = 2.5;
+      p.begruendung = "Honorarvereinbarung: Faktor 2,5 (Leistung aus Kapitel M).";
+      addFlag(p,"violation","§2 Abs. 1 S. 2 GOÄneu","Honorarvereinbarung für eine Leistung aus Kapitel M — für die Kapitel E, M, N und O ist eine solche Vereinbarung ausdrücklich unzulässig.");
+      pp.push({status:"violation", rule:"§2 Abs. 1 S. 2 GOÄneu", title:"Honorarvereinbarung in einem gesetzlich ausgeschlossenen Kapitel", detail:"§2 Abs.1 S.2 GOÄneu schließt eine abweichende Vereinbarung „für Leistungen nach den Kapiteln E, M, N und O“ ausdrücklich aus. Für Nr. "+p.goaeNr+" ist dennoch eine Honorarvereinbarung mit Faktor 2,5 hinterlegt — unzulässig."});
     }
   });
   return {pp, outcome:"Erwartetes Systemverhalten: Beleg wird zurückgewiesen bzw. es wird eine Nachforderung an die Praxis ausgelöst."};
@@ -646,59 +780,62 @@ function applyVerstoss(b){
 
 function applyAusnahme(b){
   const pp = [];
-  b.notfall = true;
-  const samstagSonntag = Math.random()<0.5;
-  const zeit = new Date(b.leistungsdatum);
-  if(samstagSonntag){
-    const dow = zeit.getDay();
-    const diffToSun = (7-dow)%7 || 7;
-    zeit.setDate(zeit.getDate()+diffToSun);
-    zeit.setHours(randInt(9,17),randInt(0,59),0,0);
+  const subtype = pick(["diagnose_schutzwuerdig","verlangensleistung","notfall_ohne_hv"]);
+  if(subtype==="notfall_ohne_hv"){
+    const nachtbesuch = makeWegegeldPos({praefix:"W", km:6, nacht:true, begruendung:"Notfallbesuch, Entfernung 6 km, Nachtbesuch (20–8 Uhr) — dringende Behandlung ohne vorherige Honorarvereinbarung (§ 8 GOÄneu)"});
+    b.positionen.push(nachtbesuch);
+    addFlag(nachtbesuch,"exception","§2 Abs. 1 S. 4 GOÄneu","Notfallbehandlung ausdrücklich von der sonst möglichen Honorarvereinbarungspflicht ausgenommen.");
+    pp.push({status:"exception", rule:"§2 Abs. 1 S. 4 GOÄneu", title:"Notfallbehandlung ohne Honorarvereinbarung", detail:"„Notfall- und akute Schmerzbehandlungen dürfen nicht von einer Vereinbarung [nach § 2] abhängig gemacht werden.“ Der Besuch wird daher zum regulären, nicht individuell vereinbarten Satz abgerechnet, obwohl der Aufwand (Nachtbesuch) hoch war — im Notfall zulässig und sogar geboten."});
+  } else if(subtype==="diagnose_schutzwuerdig"){
+    const variante = pick(["schwangerschaftsabbruch","arbeitsmedizin"]);
+    if(variante==="schwangerschaftsabbruch"){
+      const erzieh = generatePerson();
+      b.empfaenger = erzieh;
+      b.diagnose = {text:"", icd:"", kennzeichen:null, entfaellt:true, entfaelltGrund:"Schutzwürdige Interessen der Patientin (minderjährig) — Rechnungsempfänger ist die erziehungsberechtigte, zugleich zahlungspflichtige Person"};
+      pp.push({status:"exception", rule:"§12 Abs. 2 Nr. 1 GOÄneu", title:"Diagnoseangabe entfällt bei schutzwürdigen Interessen", detail:"Rechnungsempfänger ("+erzieh.vorname+" "+erzieh.nachname+") und Patientin sind nicht identisch. Das Gesetz ordnet an: „die Angaben sind nicht erforderlich, sofern schutzwürdige Interessen des Patienten entgegenstehen“ — die Ausfüllhinweise nennen als Beispiel ausdrücklich Schwangerschaftsabbrüche."});
+    } else {
+      const arbeitgeber = generatePerson();
+      b.empfaenger = {anrede:"", vorname:"", nachname:arbeitgeber.nachname+" GmbH (Arbeitgeberin)", strasse:arbeitgeber.strasse, plz:arbeitgeber.plz, ort:arbeitgeber.ort};
+      b.diagnose = {text:"", icd:"", kennzeichen:null, entfaellt:true, entfaelltGrund:"Schutzwürdige Interessen des Arbeitnehmers — Zahlungspflichtiger ist der Arbeitgeber (arbeitsmedizinische Untersuchung)"};
+      pp.push({status:"exception", rule:"§12 Abs. 2 Nr. 1 GOÄneu", title:"Diagnoseangabe entfällt bei arbeitsmedizinischer Untersuchung", detail:"Rechnungsempfänger ist die Arbeitgeberin, nicht der untersuchte Patient. Der Arbeitgeber soll laut Ausfüllhinweisen keinen Einblick in Befunde/Diagnosen erhalten — die Diagnoseangabe entfällt hier zulässigerweise wegen schutzwürdiger Interessen des Patienten."});
+    }
   } else {
-    zeit.setHours(pick([23,0,1,5]),randInt(0,59),0,0);
+    const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
+    p.praefixe = Array.from(new Set([...(p.praefixe||[]), "V"]));
+    addFlag(p,"exception","§1 Abs. 2 S. 2 GOÄneu","Verlangensleistung — geht über die medizinisch notwendige Versorgung hinaus, berechnungsfähig nur auf ausdrücklichen Patientenwunsch.");
+    pp.push({status:"exception", rule:"§1 Abs. 2 S. 2 GOÄneu", title:"Verlangensleistung (Präfix „V“)", detail:"„"+p.titel+"“ ist mit Präfix „V“ gekennzeichnet: eine Leistung, die über das medizinisch notwendige Maß hinausgeht und ausschließlich deshalb berechnet werden darf, weil die Patientin/der Patient sie ausdrücklich verlangt hat. Vor Erbringung war der Patient zudem in Textform über die voraussichtliche Honorarhöhe zu informieren (§1 Abs.2 S.3)."});
   }
-  b.leistungsdatum = zeit;
-  b.zeit = zeit;
-
-  let grund = b.leistungen.find(l=>l.nr==="1"||l.nr==="50");
-  if(!grund){ grund = makeLeistung(Z.besuch); b.leistungen.unshift(grund); }
-  const zu = makeLeistung(UNZEIT_ZUSCHLAG,{faktor:1.0, begruendung:null});
-  addFlag(zu,"exception","Zuschlagsregelung Unzeit (Abschnitt B)","Notfall-/Unzeit-Zuschlag mit dokumentierter Uhrzeit als Voraussetzungsnachweis.");
-  b.leistungen.push(zu);
-
-  pp.push({status:"exception", rule:"§12 Abs. 2 Nr. 1 GOÄ", title:"Uhrzeitangabe als Ausnahmenachweis", detail:"Behandlung am "+fmtDate(zeit)+" um "+fmtTime(zeit)+" Uhr — die Uhrzeit dokumentiert die Voraussetzung für den Unzeit-/Notfallzuschlag und ist hier inhaltlich notwendig, nicht nur optional."});
-  pp.push({status:"exception", rule:"§ 630c BGB / GOÄ-Praxis", title:"Kein vorheriger Kostenvoranschlag", detail:"Im Notfall entfällt die sonst übliche vorherige schriftliche Kostenvereinbarung bei absehbarer Überschreitung des Schwellenwerts — die Behandlungsdringlichkeit rechtfertigt die abweichende Reihenfolge."});
-  pp.push({status:"exception", rule:"Abschnitt B GOÄ (Zuschläge)", title:"Unzeit-/Notfallzuschlag neben Grundleistung", detail:"Der Zuschlag wird zusätzlich zur Grundleistung („"+grund.bez+"“) berechnet, nicht anstelle davon — das ist Voraussetzung für seine Berechnungsfähigkeit."});
-  return {pp, outcome:"Erwartetes Systemverhalten: abweichende Bearbeitung (z. B. ohne vorherigen Kostenvoranschlag) ist zulässig, sofern der Ausnahmetatbestand — hier: Uhrzeit/Datum — im Beleg dokumentiert ist."};
+  return {pp, outcome:"Erwartetes Systemverhalten: abweichende Bearbeitung ist zulässig, sofern der im Formular vorgesehene Ausnahmetatbestand (hier: Präfix bzw. dokumentierter Grund) erkennbar ist — keine automatische Ablehnung."};
 }
 
 function applyKonflikt(b){
   const pp = [];
-  const subtype = pick(["ausschluss","zuschlag_ohne_grund","zeitkollision"]);
-  if(subtype==="ausschluss"){
-    const hat7 = b.leistungen.some(l=>l.nr==="7");
-    const hat5 = b.leistungen.some(l=>l.nr==="5");
-    let l1,l2;
-    if(hat7 && !hat5){ l2 = makeLeistung(Z.symptUnters); b.leistungen.push(l2); l1=b.leistungen.find(l=>l.nr==="7"); }
-    else if(hat5 && !hat7){ l2 = makeLeistung(Z.ganzkoerper); b.leistungen.push(l2); l1=b.leistungen.find(l=>l.nr==="5"); }
-    else { l1 = makeLeistung(Z.ganzkoerper); l2 = makeLeistung(Z.symptUnters); b.leistungen.push(l1,l2); }
-    addFlag(l1,"conflict","Allgemeine Bestimmungen GOÄ","Nicht neben Nr. "+l2.nr+" am selben Behandlungstag berechnungsfähig.");
-    addFlag(l2,"conflict","Allgemeine Bestimmungen GOÄ","Nicht neben Nr. "+l1.nr+" am selben Behandlungstag berechnungsfähig.");
-    pp.push({status:"conflict", rule:"Allgemeine Bestimmungen zu Abschnitt B GOÄ", title:"Ausschluss-/Kumulationsverbot zweier Leistungen", detail:"Ziffer "+l1.nr+" und Ziffer "+l2.nr+" sind am selben Tag laut Abrechnungsbestimmungen nicht nebeneinander berechnungsfähig — beide erscheinen hier aber am selben Leistungsdatum ("+fmtDate(b.leistungsdatum)+")."});
-  } else if(subtype==="zuschlag_ohne_grund"){
-    b.leistungen = b.leistungen.filter(l=>l.nr!=="1" && l.nr!=="50" && l.nr!=="3");
-    const zu = makeLeistung(UNZEIT_ZUSCHLAG,{faktor:1.0, begruendung:null});
-    addFlag(zu,"conflict","Abschnitt B GOÄ (Zuschläge)","Zuschlag ohne zugehörige Grundleistung im selben Beleg.");
-    b.leistungen.push(zu);
-    b.notfall = true;
-    pp.push({status:"conflict", rule:"Abschnitt B GOÄ (Zuschläge)", title:"Zuschlag ohne zugehörige Grundleistung", detail:"Der Unzeit-Zuschlag wird abgerechnet, ohne dass eine Grundleistung (z. B. Beratung oder Besuch) im selben Beleg erscheint. Zuschläge sind nur neben — nicht anstelle — der zugehörigen Grundleistung berechnungsfähig: ein struktureller Regelkonflikt."});
+  const subtype = pick(["wegegeld_und_reise","unbekannter_arzt","analog_trotz_eigennummer","hv_und_ab"]);
+  if(subtype==="wegegeld_und_reise"){
+    const w = makeWegegeldPos({praefix:"W", km:12});
+    const r = makeWegegeldPos({praefix:"R", km:38});
+    b.positionen.push(w,r);
+    addFlag(w,"conflict","§8/§9 GOÄneu","Wegegeld und Reiseentschädigung gleichzeitig abgerechnet — Reiseentschädigung tritt laut Gesetz an die Stelle des Wegegelds.");
+    addFlag(r,"conflict","§8/§9 GOÄneu","Wegegeld und Reiseentschädigung gleichzeitig abgerechnet — Reiseentschädigung tritt laut Gesetz an die Stelle des Wegegelds.");
+    pp.push({status:"conflict", rule:"§9 Abs. 1 GOÄneu", title:"Wegegeld und Reiseentschädigung gleichzeitig", detail:"Beide Positionen erscheinen im selben Beleg. §9 Abs.1 GOÄneu ordnet an: „Bei Besuchen über eine Entfernung von mehr als 25 Kilometern … tritt an die Stelle des Wegegeldes eine Reiseentschädigung“ — beide nebeneinander für denselben Besuch sind ein struktureller Widerspruch."});
+  } else if(subtype==="unbekannter_arzt"){
+    const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
+    p.arztNr = 2;
+    addFlag(p,"conflict","Kap. 3.5/3.9 lfd. Nr. Ärztin/Arzt","Verweist auf Arzt-Nr. 2, die in der Tabelle „Verantwortliche Ärztin/Arzt“ nicht existiert.");
+    pp.push({status:"conflict", rule:"Kap. 3.5 / 3.9 lfd. Nr. Ärztin/Arzt", title:"Leistungsposition referenziert unbekannte Arzt-Nummer", detail:"Position „"+p.titel+"“ trägt die laufende Nummer 2, im Block „Verantwortliche Ärztin/verantwortlicher Arzt“ ist aber nur Nr. 1 hinterlegt. Die Zuordnungslogik des Formulars ist damit inkonsistent."});
+  } else if(subtype==="analog_trotz_eigennummer"){
+    const a = b.fach.analog;
+    const nl = makeAnalogPos(a, {faktor:1.0});
+    nl.goaeNr = pick(b.fach.ziffern).nr;
+    addFlag(nl,"conflict","§6 Abs. 2 GOÄneu","Präfix „A“ gesetzt, obwohl eine eigene GOÄ-Nummer für dieselbe Leistung angegeben ist — Analogberechnung setzt gerade das Fehlen einer eigenen Nummer voraus.");
+    b.positionen.push(nl);
+    pp.push({status:"conflict", rule:"§6 Abs. 2 S. 1 GOÄneu", title:"Analogkennzeichnung trotz vorhandener eigener Nummer", detail:"Eine Analogabrechnung ist nach §6 Abs.2 S.1 GOÄneu nur zulässig, „solange sie noch nicht in das Gebührenverzeichnis aufgenommen sind“. Hier ist zugleich eine reguläre, eigenständige GOÄ-Nummer für dieselbe Leistung angegeben — ein inhaltlicher Widerspruch."});
   } else {
-    const l1 = makeLeistung(Z.langzeitEkg);
-    const l2 = makeLeistung(Z.echo);
-    b.leistungen.push(l1,l2);
-    addFlag(l1,"conflict","Plausibilitätsprüfung","Zeitgebundene Leistung überschneidet sich mit weiterer zeitgebundener Leistung am selben Tag.");
-    addFlag(l2,"conflict","Plausibilitätsprüfung","Zeitgebundene Leistung überschneidet sich mit weiterer zeitgebundener Leistung am selben Tag.");
-    pp.push({status:"conflict", rule:"Zeitplausibilität (Abschnitt E)", title:"Zeitbindung zweier Leistungen kollidiert", detail:"Nr. "+l1.nr+" (Langzeit-EKG, mind. 18 Stunden Aufzeichnung) und Nr. "+l2.nr+" (Echokardiografie) sind am selben Kalendertag dokumentiert. Die zeitliche Bindung beider Leistungen ist in der Praxis kaum gleichzeitig plausibel — ein klassischer Fall für eine automatisierte Plausibilitätsprüfung."});
+    const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
+    p.faktorGrund = ["HV","AB"];
+    p.faktor = round2(1.5*0.9);
+    addFlag(p,"conflict","§2 Abs. 2 GOÄneu · Faktor-Grund „HV“","Honorarvereinbarung (HV) mit weiterem Faktor-Grund kombiniert und multipliziert.");
+    pp.push({status:"conflict", rule:"§2 Abs. 2 GOÄneu · Faktor-Grund „HV“", title:"Honorarvereinbarung mit zusätzlicher Faktor-Multiplikation", detail:"Nach §2 Abs.2 GOÄneu legt die Honorarvereinbarung „den Faktor“ für eine bestimmte Leistung individuell fest — das Rechnungsformular stellt klar: „Bei Honorarvereinbarungen gilt der dort vereinbarte Faktor. Eine Multiplikation findet nicht statt.“ Hier ist „HV“ aber zusammen mit „AB“ angegeben und beide Faktoren wurden multipliziert — das widerspricht dem Konzept der Individualvereinbarung."});
   }
   return {pp, outcome:"Erwartetes Systemverhalten: automatisierte Prüfung markiert einen Regelkonflikt zur Entscheidung — weder automatische Annahme noch automatische Ablehnung."};
 }
@@ -717,123 +854,150 @@ function classify(base, kategorie){
   return {beleg:b, pp:result.pp, outcome:result.outcome};
 }
 
-/* ========================= Rendering: Beleg-Layouts ========================= */
-function flagHtml(l){
-  if(!l.flags || !l.flags.length) return "";
-  return l.flags.map(f=>'<span class="flag flag-'+f.type+'" title="'+esc(f.rule+" — "+f.text)+'">'+ICONS[f.type]+esc(f.type==="violation"?"Verstoß":f.type==="boundary"?"Grenzfall":f.type==="exception"?"Ausnahme":"Konflikt")+'</span>').join("");
+/* ========================= Rendering: Beleg ========================= */
+function flagHtml(p){
+  if(!p.flags || !p.flags.length) return "";
+  return p.flags.map(f=>'<span class="flag flag-'+f.type+'" title="'+esc(f.rule+" — "+f.text)+'">'+ICONS[f.type]+esc(f.type==="violation"?"Verstoß":f.type==="boundary"?"Grenzfall":f.type==="exception"?"Ausnahme":"Konflikt")+'</span>').join("");
 }
-
-function leistungRows(b, footnotes){
-  return b.leistungen.map(l=>{
-    let bezHtml = esc(l.bez);
-    if(l.analog){
-      if(l.analogLabelMissing){
-        bezHtml += ' <span class="mono" style="font-size:.78em;color:var(--ink-doc-soft)">(entspr. Nr. '+esc(l.analogBasisNr)+')</span>';
-      } else {
-        bezHtml += ' <span class="mono" style="font-size:.78em;color:var(--ink-doc-soft)">— entspr. Nr. '+esc(l.analogBasisNr)+' „'+esc(l.analogBasisBez)+'“, Analog-Berechnung</span>';
-      }
-    }
-    let fnRef = "";
-    if(l.faktor>l.schwellenwert){
-      if(l.begruendung){
-        footnotes.push(esc(l.nr)+": "+esc(l.begruendung));
-        fnRef = '<sup class="footnote-ref">'+footnotes.length+')</sup>';
-      }
-    }
-    let sk = "";
-    if(l.sachkosten){
-      sk = '<tr><td colspan="2" style="padding-left:20px;font-size:.85em;color:var(--ink-doc-soft)">'+
-           (l.sachkostenPauschal ? "Sachkosten (Pauschale)" : "Sachkosten: "+esc(l.sachkosten.bez))+'</td>'+
-           '<td></td><td class="num">'+euro(l.sachkosten.betrag)+'</td></tr>';
-    }
-    return '<tr>'+
-      '<td class="mono">'+fmtDate(b.leistungsdatum)+'</td>'+
-      '<td class="mono">'+esc(l.nr)+'</td>'+
-      '<td>'+bezHtml+flagHtml(l)+'</td>'+
-      '<td class="num mono">'+l.faktor.toFixed(2).replace(".",",")+fnRef+'</td>'+
-      '<td class="num mono">'+euro(l.betrag)+'</td>'+
-      '</tr>'+sk;
+function praefixHtml(p){
+  if(!p.praefixe || !p.praefixe.length) return "";
+  return p.praefixe.map(code=>{
+    const info = PRAEFIX_INFO[code];
+    return '<span class="praefix-chip" title="'+esc((info?info.label:code)+(info&&info.desc?" — "+info.desc:""))+'">'+esc(code)+'</span>';
   }).join("");
 }
 
-function sumBlock(b){
-  const real = summe(b);
-  const shown = b.summenFehler ? round2(real - b.summenFehler) : real;
-  return '<div class="sum-block"><table><tbody>'+
-    '<tr><td>Zwischensumme</td><td class="num mono">'+euro(real)+'</td></tr>'+
-    '<tr class="total"><td>Gesamtbetrag</td><td class="num mono">'+euro(shown)+'</td></tr>'+
-    '</tbody></table></div>';
-}
-
-function diagBlock(b){
-  const cls = b.diagnoseFlag ? "diag-line is-flagged" : "diag-line";
-  const val = b.diagnoseFlag ? '<span class="flag flag-violation" title="§12 Abs. 2 Nr. 6 GOÄ — Diagnoseangabe fehlt">'+ICONS.violation+'Verstoß</span> <em>keine Angabe</em>' : esc(b.diagnose);
-  return '<div class="'+cls+'"><span class="label">Diagnose / Behandlungsanlass</span>'+val+'</div>';
+function positionRow(p, datum){
+  let titel = p.titel ? esc(p.titel) : '<span class="flag flag-violation" title="Kap. 3.9 — Titel der Leistungslegende fehlt">'+ICONS.violation+'Verstoß</span> <em>ohne Titel</em>';
+  if(p.dauer) titel += ' <span class="mono" style="font-size:.78em;color:var(--ink-doc-soft)">('+esc(p.dauer)+')</span>';
+  const fg = p.faktorGrund && p.faktorGrund.length ? p.faktorGrund.join("") : "–";
+  const faktorTxt = p.faktor!==null ? p.faktor.toFixed(2).replace(".",",") : "–";
+  let begr = p.begruendung ? esc(p.begruendung) : "–";
+  if(p.begruendung==="" ) begr = '<span class="flag flag-violation" title="Begründung erforderlich, aber leer">'+ICONS.violation+'Verstoß</span>';
+  return '<tr>'+
+    '<td class="mono">'+fmtDate(datum)+'</td>'+
+    '<td class="num mono">'+p.anzahl+'</td>'+
+    '<td>'+praefixHtml(p)+'</td>'+
+    '<td class="mono">'+(p.goaeNr||"–")+'</td>'+
+    '<td>'+titel+flagHtml(p)+'</td>'+
+    '<td style="max-width:220px;">'+begr+'</td>'+
+    '<td class="mono">'+fg+'</td>'+
+    '<td class="num mono">'+faktorTxt+'</td>'+
+    '<td class="num mono">'+euro(p.betrag)+'</td>'+
+    '</tr>';
 }
 
 function tableHtml(b){
-  const footnotes = [];
-  const rows = leistungRows(b, footnotes);
-  const fn = footnotes.length ? '<ol class="footnotes">'+footnotes.map(f=>'<li>'+f+'</li>').join("")+'</ol>' : "";
+  const rows = b.positionen.map(p=>positionRow(p, b.leistungsdatum)).join("");
+  const s = summen(b);
+  const shownGesamt = b.summenFehler ? round2(s.gesamt - b.summenFehler) : s.gesamt;
+  let sumRows = '<tr class="sub"><td>Zwischensumme GOÄ-Leistungen</td><td class="num mono">'+euro(s.vergSum)+'</td></tr>';
+  if(b.minderung){
+    sumRows += '<tr class="sub"><td>Minderung ('+b.minderung.prozent+' %, §6a GOÄ)</td><td class="num mono">– '+euro(s.minderung)+'</td></tr>';
+    sumRows += '<tr class="sub"><td>Gesamtbetrag ärztliche Leistungen</td><td class="num mono">'+euro(s.nachMinderung)+'</td></tr>';
+  }
+  if(s.sachkosten>0) sumRows += '<tr class="sub"><td>Gesamtbetrag Sachkosten/Auslagen</td><td class="num mono">'+euro(s.sachkosten)+'</td></tr>';
+  if(s.wegegeld>0) sumRows += '<tr class="sub"><td>Gesamtbetrag Wegegeld/Reiseentschädigung</td><td class="num mono">'+euro(s.wegegeld)+'</td></tr>';
+  sumRows += '<tr class="total"><td>Gesamtrechnungsbetrag</td><td class="num mono">'+euro(shownGesamt)+'</td></tr>';
   return '<div class="table-scroll"><table><thead><tr>'+
-    '<th>Datum</th><th>Ziffer</th><th>Leistung</th><th class="num">Faktor</th><th class="num">Betrag</th>'+
-    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+fn+sumBlock(b);
+    '<th>Datum</th><th class="num">Anz.</th><th>Präfix</th><th>GOÄ-Nr.</th><th>Leistung / Kurzbezeichnung</th><th>Begründung</th><th>Faktor-Grund</th><th class="num">Faktor</th><th class="num">Betrag EUR</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="sum-block"><table><tbody>'+sumRows+'</tbody></table></div>';
 }
 
-function notfallLine(b){
-  if(!b.notfall || !b.zeit) return "";
-  return '<div class="diag-line" style="margin-top:10px;"><span class="label">Behandlungszeitpunkt</span>'+
-    fmtDate(b.zeit)+', '+fmtTime(b.zeit)+' Uhr <span class="flag flag-exception" title="Notfall-/Unzeitbehandlung">'+ICONS.exception+'Notfall</span></div>';
+function diagBlock(b){
+  if(b.diagnose.entfaellt){
+    return '<div class="diag-line is-exception"><span class="label">'+dot("g")+'Diagnose / Behandlungsanlass</span>'+
+      '<span class="flag flag-exception" title="Kap. 3.7 — Diagnoseangabe entfällt zulässigerweise">'+ICONS.exception+'Ausnahme</span> entfällt: '+esc(b.diagnose.entfaelltGrund)+'</div>';
+  }
+  if(b.diagnoseFlag || !b.diagnose.text){
+    return '<div class="diag-line is-flagged"><span class="label">'+dot("p")+'Diagnose / Behandlungsanlass</span>'+
+      '<span class="flag flag-violation" title="Kap. 3.7 GOÄ-Formular — Diagnoseangabe fehlt">'+ICONS.violation+'Verstoß</span> <em>keine Angabe</em></div>';
+  }
+  const kz = b.diagnose.kennzeichen ? ' <span class="mono" style="font-size:.8em;color:var(--ink-doc-soft)">['+b.diagnose.kennzeichen+' – '+esc(DIAGNOSE_KENNZEICHEN[b.diagnose.kennzeichen])+']</span>' : "";
+  return '<div class="diag-line"><span class="label">'+dot("p")+'Diagnose / Behandlungsanlass</span>'+esc(b.diagnose.text)+' <span class="mono" style="font-size:.85em;color:var(--ink-doc-soft)">(ICD-10 '+esc(b.diagnose.icd)+')</span>'+kz+'</div>';
 }
+
+function empfaengerBlock(b){
+  const e = b.empfaenger || b.patient;
+  const isPatient = !b.empfaenger;
+  return '<div class="field-block">'+
+    (isPatient ? "" : '<div class="label">'+dot("p")+'Rechnungsempfänger/-in (abweichend von Patientin/Patient)</div>')+
+    (e.anrede?esc(e.anrede)+" ":"")+(e.titel?esc(e.titel)+" ":"")+esc(e.vorname?e.vorname+" ":"")+esc(e.nachname)+'<br>'+
+    esc(e.strasse)+'<br>'+esc(e.plz)+' '+esc(e.ort)+
+  '</div>';
+}
+function verantwortlicherArztBlock(b){
+  return '<div class="field-block">'+b.verantwortlicheAerzte.map(a=>
+    '<div>'+(b.verantwortlicheAerzte.length>1?'<span class="mono" style="color:var(--ink-doc-soft);">Nr. '+a.lfdNr+'</span> ':'')+esc(a.anrede)+' '+esc(a.titel)+' '+esc(a.name)+
+    '<span style="color:var(--ink-doc-soft); font-size:.85em;"> · LANR '+esc(a.lanr)+'</span></div>'
+  ).join("")+'</div>';
+}
+
+function notfallLine(){ return ""; }
 
 function renderLayoutA(b){
   const geb = fmtDate(b.patient.geboren);
+  const s = summen(b);
   return '<div class="lay-a">'+
     '<div class="doc-head">'+
       '<div class="practice"><div class="name">'+esc(b.arzt.praxis)+'</div>'+
-      '<div class="sub">'+esc(b.arzt.name)+' · Fachärztin/Facharzt für '+esc(b.arzt.fach)+'<br>'+esc(b.arzt.strasse)+', '+esc(b.arzt.plz)+' '+esc(b.arzt.ort)+'</div></div>'+
-      '<div class="recipient">'+esc(b.patient.name)+'<br>'+esc(b.patient.strasse)+'<br>'+esc(b.patient.plz)+' '+esc(b.patient.ort)+'<br><span class="mono" style="font-size:.8em;color:var(--ink-doc-soft)">geb. '+geb+'</span></div>'+
+      '<div class="sub">'+esc(b.arzt.titel)+' '+esc(b.arzt.vorname)+' '+esc(b.arzt.nachname)+' · '+esc(b.arzt.fach)+'<br>'+esc(b.arzt.strasse)+', '+esc(b.arzt.plz)+' '+esc(b.arzt.ort)+'</div></div>'+
+      '<div class="recipient">'+empfaengerBlock(b)+'</div>'+
     '</div>'+
     '<h3 class="doc-title">Rechnung Nr. '+esc(b.id)+'</h3>'+
-    '<p class="doc-sub">Rechnungsdatum '+fmtDate(b.rechnungsdatum)+' · Behandlung gemäß GOÄ</p>'+
-    diagBlock(b)+notfallLine(b)+
+    '<p class="doc-sub">Rechnungsdatum '+fmtDate(b.rechnungsdatum)+' · Gesamtbetrag '+euro(s.gesamt)+' · Behandlung gemäß GOÄ</p>'+
+    '<div class="blocks-row">'+
+      '<div><div class="field-block"><div class="label">'+dot("p")+'Patientin/Patient</div>'+esc(b.patient.anrede)+' '+esc(b.patient.vorname)+' '+esc(b.patient.nachname)+'<br>geb. '+geb+'</div></div>'+
+      '<div><div class="field-block"><div class="label">'+dot("p")+'Verantwortliche Ärztin/verantwortlicher Arzt</div>'+verantwortlicherArztBlock(b)+'</div></div>'+
+    '</div>'+
+    diagBlock(b)+
+    '<div class="section-title">Vergütungen</div>'+
     tableHtml(b)+
-    '<div class="footnotes" style="border-top:none;margin-top:18px;">Steuernummer '+esc(b.arzt.steuerNr)+' · Bitte überweisen Sie den Betrag unter Angabe der Rechnungsnummer auf IBAN '+esc(b.arzt.iban)+'.</div>'+
+    (b.weitereAngaben ? '<div class="section-title">Weitere erforderliche Angaben</div><div class="field-block">'+esc(b.weitereAngaben)+'</div>' : '')+
+    '<div class="schlussvermerk">Diese Rechnung ist maschinell erstellt und ohne Unterschrift gültig. · IBAN '+esc(b.arzt.iban)+'</div>'+
   '</div>';
 }
 
 function renderLayoutB(b){
+  const s = summen(b);
   return '<div class="lay-b">'+
     '<div class="doc-head">'+
-      '<div><div class="pvs-tag">Abrechnung im Auftrag der Praxis</div>'+
+      '<div>'+(b.abrechnungsstelle?'<div class="pvs-tag">Abrechnung im Auftrag von '+esc(b.arzt.titel)+' '+esc(b.arzt.nachname)+'</div>':'')+
       '<div class="doc-title">Honorarrechnung '+esc(b.id)+'</div>'+
-      '<div style="font-size:.85rem;line-height:1.6;">'+esc(b.arzt.name)+', '+esc(b.arzt.fach)+'<br>'+esc(b.arzt.praxis)+' · '+esc(b.arzt.strasse)+', '+esc(b.arzt.plz)+' '+esc(b.arzt.ort)+'</div></div>'+
-      '<div class="idbox"><b>Rechnungsdatum</b>'+fmtDate(b.rechnungsdatum)+'<br><b>Leistungsdatum</b>'+fmtDate(b.leistungsdatum)+'<br><b>Patienten-Nr.</b>'+esc(b.patient.versNr)+'</div>'+
+      '<div class="field-block">'+esc(b.arzt.titel)+' '+esc(b.arzt.vorname)+' '+esc(b.arzt.nachname)+', '+esc(b.arzt.fach)+'<br>'+esc(b.arzt.praxis)+' · '+esc(b.arzt.strasse)+', '+esc(b.arzt.plz)+' '+esc(b.arzt.ort)+
+      (b.abrechnungsstelle?'<br><span style="color:var(--ink-doc-soft); font-size:.85em;">Abrechnungsstelle: MedAbrechnung '+esc(b.arzt.ort)+' GmbH · IBAN '+esc(b.arzt.iban)+'</span>':'')+'</div></div>'+
+      '<div class="idbox">'+dot("p")+'<b>Rechnungsdatum</b>'+fmtDate(b.rechnungsdatum)+'<br>'+dot("p")+'<b>Leistungsdatum</b>'+fmtDate(b.leistungsdatum)+'<br>'+dot("p")+'<b>Gesamtrechnungsbetrag</b>'+euro(s.gesamt)+'</div>'+
     '</div>'+
-    '<div class="parties">'+
-      '<div><span class="label">Rechnungsempfänger:in</span>'+esc(b.patient.name)+'<br>'+esc(b.patient.strasse)+'<br>'+esc(b.patient.plz)+' '+esc(b.patient.ort)+'</div>'+
-      '<div><span class="label">Geburtsdatum</span>'+fmtDate(b.patient.geboren)+'</div>'+
+    '<div class="blocks-row">'+
+      '<div>'+empfaengerBlock(b)+'</div>'+
+      '<div><div class="field-block"><div class="label">'+dot("p")+'Patientin/Patient</div>'+esc(b.patient.anrede)+' '+esc(b.patient.vorname)+' '+esc(b.patient.nachname)+'<br>geb. '+fmtDate(b.patient.geboren)+'</div></div>'+
     '</div>'+
-    diagBlock(b)+notfallLine(b)+
+    diagBlock(b)+
+    '<div class="section-title">Vergütungen</div>'+
     tableHtml(b)+
-    '<div class="foot-note">Rechnungsstellung im Auftrag und für Rechnung von '+esc(b.arzt.name)+'. Zahlung bitte auf IBAN '+esc(b.arzt.iban)+' unter Angabe der Rechnungsnummer '+esc(b.id)+'.</div>'+
+    '<div class="foot-note">Verantwortliche Ärztin/verantwortlicher Arzt: '+verantwortlicherArztBlock(b)+' · Zahlung bitte auf IBAN '+esc(b.arzt.iban)+' unter Angabe der Rechnungsnummer '+esc(b.id)+'.<br>Diese Rechnung ist maschinell erstellt und ohne Unterschrift gültig.</div>'+
   '</div>';
 }
 
 function renderLayoutC(b){
+  const s = summen(b);
+  const e = b.empfaenger || b.patient;
   return '<div class="lay-c">'+
     '<div class="doc-head">'+
-      '<div class="practice-line">'+esc(b.arzt.name)+'</div>'+
+      '<div class="practice-line">'+esc(b.arzt.titel)+' '+esc(b.arzt.vorname)+' '+esc(b.arzt.nachname)+'</div>'+
       '<div class="addr-line">'+esc(b.arzt.praxis)+' · '+esc(b.arzt.strasse)+' · '+esc(b.arzt.plz)+' '+esc(b.arzt.ort)+'</div>'+
-      '<div class="recipient">'+esc(b.patient.name)+'<br>'+esc(b.patient.strasse)+'<br>'+esc(b.patient.plz)+' '+esc(b.patient.ort)+'</div>'+
+      '<div class="recipient">'+(e.anrede?esc(e.anrede)+" ":"")+(e.titel?esc(e.titel)+" ":"")+esc(e.vorname?e.vorname+" ":"")+esc(e.nachname)+'<br>'+esc(e.strasse)+'<br>'+esc(e.plz)+' '+esc(e.ort)+'</div>'+
       '<div class="place-date">'+esc(b.arzt.ort)+', den '+fmtDate(b.rechnungsdatum)+'</div>'+
       '<div class="subject">Rechnung Nr. '+esc(b.id)+' über privatärztliche Leistungen</div>'+
     '</div>'+
-    '<p class="salutation">Sehr geehrte(r) '+esc(b.patient.name.split(" ").slice(1).join(" ")||b.patient.name)+',</p>'+
-    '<p>für die Behandlung am '+fmtDate(b.leistungsdatum)+' berechne ich Ihnen gemäß Gebührenordnung für Ärzte folgende Leistungen:</p>'+
-    diagBlock(b)+notfallLine(b)+
+    '<p class="salutation">Sehr geehrte'+(b.patient.anrede==="Frau"?"":"r")+' '+esc(e.anrede||b.patient.anrede)+' '+esc(e.nachname||b.patient.nachname)+',</p>'+
+    '<p>für die Behandlung von '+esc(b.patient.vorname)+' '+esc(b.patient.nachname)+' (geb. '+fmtDate(b.patient.geboren)+') am '+fmtDate(b.leistungsdatum)+' berechne ich gemäß Gebührenordnung für Ärzte folgende Leistungen:</p>'+
+    diagBlock(b)+
+    '<div class="section-title">Vergütungen</div>'+
     tableHtml(b)+
-    '<p class="closing">Bitte überweisen Sie den Rechnungsbetrag auf IBAN '+esc(b.arzt.iban)+'.<br><br>Mit freundlichen Grüßen<br>'+esc(b.arzt.name)+'</p>'+
+    '<p class="closing">Verantwortlich: '+verantwortlicherArztBlock(b)+'Bitte überweisen Sie '+euro(s.gesamt)+' auf IBAN '+esc(b.arzt.iban)+'.<br><br>Mit freundlichen Grüßen<br>'+esc(b.arzt.titel)+' '+esc(b.arzt.vorname)+' '+esc(b.arzt.nachname)+'</p>'+
+    '<div class="schlussvermerk">Diese Rechnung ist maschinell erstellt und ohne Unterschrift gültig.</div>'+
   '</div>';
 }
 
@@ -843,8 +1007,8 @@ function renderDocument(b){
   const fn = b.layout==="a" ? renderLayoutA : b.layout==="b" ? renderLayoutB : renderLayoutC;
   el.innerHTML = fn(b);
   document.getElementById("beleg-id").textContent = b.id;
-  const layoutNames = {a:"Klassisch-tabellarisch", b:"PVS-Stil", c:"Brief-Stil"};
-  document.getElementById("layout-badge").innerHTML = "Layout: <b>"+layoutNames[b.layout]+"</b> · Inhalt nach §12-Systematik (Layout ist gesetzlich nicht vorgegeben)";
+  const layoutNames = {a:"Klassisch-tabellarisch", b:"PVS-Stil (Abrechnungsstelle)", c:"Brief-Stil"};
+  document.getElementById("layout-badge").innerHTML = "Kopf-Layout: <b>"+layoutNames[b.layout]+"</b> · Vergütungstabelle: fixe Feldnamen &amp; Reihenfolge lt. Formular";
 }
 
 /* ========================= Rendering: Kategorien & Klassifikation ========================= */
@@ -888,25 +1052,22 @@ function renderClassification(kategorie, result){
 
 /* ========================= State & Wiring ========================= */
 let baseBeleg = null;
-let activeCategory = null;
 
 function newBeleg(){
   baseBeleg = generateBeleg();
-  activeCategory = null;
   renderDocument(baseBeleg);
   document.getElementById("step-pill").textContent = "Schritt 1 · Beispielbeleg";
-  document.querySelector(".stage-heading h2").textContent = "Echter Beispielbeleg";
+  document.getElementById("stage-heading-text").textContent = "Echter Beispielbeleg";
   document.querySelectorAll(".cat-btn").forEach(b=>b.dataset.active="false");
   document.getElementById("classification-panel").hidden = true;
 }
 
 function selectCategory(cat){
-  activeCategory = cat;
   document.querySelectorAll(".cat-btn").forEach(b=>b.dataset.active = (b.dataset.cat===cat) ? "true" : "false");
   const result = classify(baseBeleg, cat);
   renderDocument(result.beleg);
   document.getElementById("step-pill").textContent = "Schritt 2 · Einordnung";
-  document.querySelector(".stage-heading h2").textContent = CATEGORY_META[cat].label;
+  document.getElementById("stage-heading-text").textContent = CATEGORY_META[cat].label;
   renderClassification(cat, result);
 }
 
