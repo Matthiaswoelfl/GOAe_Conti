@@ -202,10 +202,11 @@
 
   /* Field blocks (Rechnungsempfänger, -steller, Patient, Arzt, Diagnose...) */
   .field-block{font-family:"IBM Plex Sans",sans-serif; font-size:.86rem; line-height:1.7;}
-  .field-block .label{
+  .field-block .label, .diag-line .label{
     font:600 .64rem/1 "IBM Plex Sans"; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-doc-soft);
-    display:flex; align-items:center; gap:5px; margin-bottom:2px;
+    display:flex; align-items:center; gap:5px; margin-bottom:4px;
   }
+  .diag-line{font-family:"IBM Plex Sans",sans-serif; font-size:.86rem;}
   .field-block .label i{width:7px; height:7px; border-radius:2px; display:inline-block; flex:none;}
   .field-dot-p{background:var(--field-pflicht);} .field-dot-g{background:var(--field-ggf);} .field-dot-f{background:var(--field-frei);}
   .blocks-row{display:grid; grid-template-columns:1fr 1fr; gap:26px;}
@@ -404,7 +405,7 @@ function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function pickN(arr,n){ const c=arr.slice(); const out=[]; n=Math.min(n,c.length); for(let i=0;i<n;i++){ out.push(c.splice(Math.floor(Math.random()*c.length),1)[0]); } return out; }
 function randInt(a,b){ return a+Math.floor(Math.random()*(b-a+1)); }
 function euro(n){ return n.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2})+" €"; }
-function fmtDate(d){ return d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"}); }
+function fmtDate(d){ if(!(d instanceof Date)) d = new Date(d); return d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric"}); }
 function addDays(d,n){ const c=new Date(d); c.setDate(c.getDate()+n); return c; }
 function round2(n){ return Math.round(n*100)/100; }
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
@@ -647,6 +648,7 @@ function cloneBeleg(b){
   const c = JSON.parse(JSON.stringify(b));
   c.leistungsdatum = new Date(b.leistungsdatum);
   c.rechnungsdatum = new Date(b.rechnungsdatum);
+  c.patient.geboren = new Date(b.patient.geboren);
   c.fach = b.fach;
   return c;
 }
