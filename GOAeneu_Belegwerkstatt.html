@@ -307,6 +307,48 @@
   .cp-outcome svg{flex:none; width:17px; height:17px; margin-top:1px;}
   .cp-outcome b{display:block; font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px; opacity:.85;}
 
+  /* Kundentexte (Regeltext -> Kundentext DE/EN) */
+  .kt-block{
+    margin-top:10px; padding-top:10px; border-top:1px dashed var(--card-border);
+    display:grid; grid-template-columns:1fr 1fr; gap:10px;
+  }
+  @media (max-width:560px){.kt-block{grid-template-columns:1fr;}}
+  .kt-col{font-size:.83rem; line-height:1.5; color:var(--ink);}
+  .kt-lang{display:block; font:700 .62rem/1 "Source Sans 3"; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin-bottom:3px;}
+
+  /* Ablehnen/Kürzen Aktionen */
+  .cp-actions{
+    margin-top:16px; padding-top:16px; border-top:1px solid var(--card-border);
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .cp-actions-label{font-size:.84rem; color:var(--ink-soft); margin-right:2px;}
+  .btn-reject{background:var(--cat-violation); color:#fff;}
+  .btn-reject:hover{filter:brightness(0.92);}
+  .btn-reduce{background:var(--cat-boundary); color:#fff;}
+  .btn-reduce:hover{filter:brightness(0.92);}
+  .btn-reject svg, .btn-reduce svg{width:15px; height:15px;}
+
+  .letter-panel{
+    margin-top:16px; padding:18px; border-radius:12px; background:var(--card-bg);
+    border:1px solid var(--card-border);
+  }
+  .letter-head h3{margin:0 0 3px; font-size:1rem;}
+  .letter-sub{margin:0 0 14px; font-size:.82rem; color:var(--ink-soft);}
+  .letter-cols{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  @media (max-width:720px){.letter-cols{grid-template-columns:1fr;}}
+  .letter-col{background:var(--paper); border:1px solid var(--paper-edge); border-radius:10px; padding:14px; min-width:0;}
+  .letter-col-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
+  .letter-col-head span{font:700 .72rem/1 "Source Sans 3"; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-doc-soft);}
+  .btn-copy{
+    font:600 .72rem/1 "Source Sans 3"; padding:6px 10px; border-radius:7px; border:1px solid var(--paper-rule);
+    background:transparent; color:var(--ink-doc-soft); cursor:pointer;
+  }
+  .btn-copy:hover{border-color:var(--accent); color:var(--accent-strong);}
+  .letter-col pre{
+    margin:0; font-family:"Source Serif 4",Georgia,serif; font-size:.86rem; line-height:1.6;
+    color:var(--ink-doc); white-space:pre-wrap; word-wrap:break-word;
+  }
+
   footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--card-border); font-size:.78rem; color:var(--ink-soft); line-height:1.7;}
   footer h4{margin:0 0 6px; font-size:.78rem; color:var(--ink); text-transform:uppercase; letter-spacing:.05em;}
 
@@ -397,6 +439,8 @@
   <footer>
     <h4>Zu den Kategorien</h4>
     <p>Die fünf Kategorien greifen die Continentale-Anforderung an die automatisierte Testfallerzeugung auf: <strong>korrekte Fälle</strong> (fehlerfrei), <strong>Grenzfälle</strong> (an definierten Auslegungsgrenzen des Formulars, z.&nbsp;B. Faktor-Grund-Multiplikation, 25-km-Grenze Wegegeld/Reiseentschädigung, Minderungssatz §6a), <strong>Verstöße</strong> (gezielte Verletzung einer im Formular als Pflicht- bzw. ggf.-Pflichtangabe definierten Vorgabe), <strong>Ausnahmefälle</strong> (im Formular selbst vorgesehene Abweichungen, z.&nbsp;B. entfallende Diagnoseangabe bei schutzwürdigen Interessen) und <strong>Konfliktfälle</strong> (widersprüchliche Kombinationen von Präfixen/Feldern, z.&nbsp;B. Wegegeld und Reiseentschädigung gleichzeitig). Jede Generierung würfelt Praxis, Fachrichtung, Diagnose, Leistungsziffern und Beleg-Kopf-Layout neu aus.</p>
+    <h4 style="margin-top:16px;">Zu den Kundentexten</h4>
+    <p>Jeder Prüfpunkt erzeugt zusätzlich einen kundenorientierten Text in Deutsch und Englisch — aus dem technischen Regeltext übersetzt in eine für Versicherte verständliche Formulierung, gedacht für den Druck auf der Leistungsabrechnung. Bei Verstoß-Belegen lassen sich daraus über „Ablehnen“ bzw. „Kürzen“ zusätzlich vollständige, zweisprachige Schreiben erzeugen: „Ablehnen“ weist die Rechnung insgesamt zur Korrektur zurück, „Kürzen“ berechnet den erstattungsfähigen Betrag anhand der einzelnen Beanstandungen neu und stellt beide Beträge gegenüber.</p>
   </footer>
 </div>
 
@@ -566,7 +610,7 @@ function makeVergPos(z, opts){
     kind:"leistung",
     anzahl: 1,
     praefixe: opts.praefixe || [],
-    goaeNr: z.nr, titel: z.bez, dauer: z.dauer||null,
+    goaeNr: z.nr, titel: z.bez, dauer: z.dauer||null, satz1: z.satz1,
     begruendung: opts.begruendung!==undefined ? opts.begruendung : null,
     faktorGrund: opts.faktorGrund || [],
     faktor, betrag,
@@ -613,7 +657,7 @@ function makeAnalogPos(a, opts){
   const betrag = round2(a.satz1*faktor);
   return {
     id: Math.random().toString(36).slice(2,9), kind:"analog",
-    anzahl:1, praefixe:["A"], goaeNr: a.basisNr, titel: a.basisBez, dauer:null,
+    anzahl:1, praefixe:["A"], goaeNr: a.basisNr, titel: a.basisBez, dauer:null, satz1: a.satz1,
     begruendung: opts.begruendung!==undefined ? opts.begruendung : ((opts.analogPrefix!==false?"Analog: ":"")+a.echt),
     faktorGrund: opts.faktorGrund||[], faktor, betrag, arztNr:1, flags:[],
   };
@@ -695,13 +739,18 @@ const CATEGORY_META = {
 };
 
 function addFlag(p, type, rule, text){ p.flags.push({type, rule, text}); }
+function kt(de,en){ return {de,en}; }
 
 function applyKorrekt(b){
   const pp = [];
-  pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 1 GOÄneu", title:"Diagnose vollständig angegeben", detail:"„"+b.diagnose.text+"“ (ICD-10 "+b.diagnose.icd+") ist als behandlungsrelevante Diagnose benannt."});
-  pp.push({status:"ok", rule:"§5 GOÄneu / §12 Abs. 2 Nr. 3–4", title:"Fester Gebührensatz ohne Faktor-Abweichung", detail:"Jede Position trägt den vollen Eurobetrag aus dem Gebührenverzeichnis zum Faktor 1,0 — GOÄneu kennt keinen Steigerungsfaktor mehr; ein Faktor-Grund (HV/AB/BT/ST/NT) ist hier nicht einschlägig und folgerichtig auch nicht gesetzt."});
-  pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 3 GOÄneu", title:"Nummer, Anzahl und Titel der Leistungslegende vollständig", detail:"Für jede Position sind GOÄ-Nummer, Anzahl und ein patientenverständlicher Titel ausgewiesen."});
-  pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 2 / Kap. 3.13", title:"Summenbildung und Schlussvermerk korrekt", detail:"Der Gesamtrechnungsbetrag entspricht der Summe der Einzelpositionen; der vorgeschriebene Schlussvermerk ist vorhanden."});
+  pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 1 GOÄneu", title:"Diagnose vollständig angegeben", detail:"„"+b.diagnose.text+"“ (ICD-10 "+b.diagnose.icd+") ist als behandlungsrelevante Diagnose benannt.",
+    kundentext:kt("Die Diagnose wurde vollständig angegeben und bei der Prüfung berücksichtigt.","The diagnosis was provided in full and has been taken into account in our review.")});
+  pp.push({status:"ok", rule:"§5 GOÄneu / §12 Abs. 2 Nr. 3–4", title:"Fester Gebührensatz ohne Faktor-Abweichung", detail:"Jede Position trägt den vollen Eurobetrag aus dem Gebührenverzeichnis zum Faktor 1,0 — GOÄneu kennt keinen Steigerungsfaktor mehr; ein Faktor-Grund (HV/AB/BT/ST/NT) ist hier nicht einschlägig und folgerichtig auch nicht gesetzt.",
+    kundentext:kt("Für diese Leistungen wurde der reguläre Gebührensatz ohne Zuschlag berechnet.","These services were billed at the standard fee, with no surcharge.")});
+  pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 3 GOÄneu", title:"Nummer, Anzahl und Titel der Leistungslegende vollständig", detail:"Für jede Position sind GOÄ-Nummer, Anzahl und ein patientenverständlicher Titel ausgewiesen.",
+    kundentext:kt("Alle Pflichtangaben zu den abgerechneten Leistungen liegen vollständig vor.","All mandatory details for the billed services are complete.")});
+  pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 2 / Kap. 3.13", title:"Summenbildung und Schlussvermerk korrekt", detail:"Der Gesamtrechnungsbetrag entspricht der Summe der Einzelpositionen; der vorgeschriebene Schlussvermerk ist vorhanden.",
+    kundentext:kt("Die Rechnungssumme wurde rechnerisch geprüft und ist korrekt.","The invoice total has been checked and is correct.")});
   return {pp, outcome:"Erwartetes Systemverhalten: Beleg wird ohne Beanstandung zur Erstattung angenommen."};
 }
 
@@ -715,31 +764,37 @@ function applyGrenzfall(b){
     p.betrag = round2((Z[Object.keys(Z).find(k=>Z[k].nr===p.goaeNr)]||{satz1:p.betrag}).satz1 * p.faktor);
     p.begruendung = "Honorarvereinbarung vom "+fmtDate(addDays(b.leistungsdatum,-2))+": Nr. "+p.goaeNr+" „"+p.titel+"“, Faktor 2,1, vereinbarter Betrag "+euro(p.betrag)+", Hinweis auf ggf. nicht vollständige Kostenerstattung erteilt.";
     addFlag(p,"boundary","§2 Abs. 1 S. 3 GOÄneu","Honorarvereinbarung bei wahlärztlicher Leistung — zulässig nur, wenn die Leistung vom Wahlarzt höchstpersönlich erbracht wurde.");
-    pp.push({status:"boundary", rule:"§2 Abs. 1 S. 3 GOÄneu", title:"Honorarvereinbarung bei (vermutet) wahlärztlicher Leistung", detail:"Bei vollstationären u.ä. wahlärztlichen Leistungen ist eine Honorarvereinbarung „nur für vom Wahlarzt höchstpersönlich erbrachte Leistungen zulässig“. Die Vereinbarung selbst enthält alle Pflichtangaben nach §2 Abs.2 — ob die persönliche Erbringung durch den Wahlarzt vorlag, ist dem Beleg allein aber nicht anzusehen."});
+    pp.push({status:"boundary", rule:"§2 Abs. 1 S. 3 GOÄneu", title:"Honorarvereinbarung bei (vermutet) wahlärztlicher Leistung", detail:"Bei vollstationären u.ä. wahlärztlichen Leistungen ist eine Honorarvereinbarung „nur für vom Wahlarzt höchstpersönlich erbrachte Leistungen zulässig“. Die Vereinbarung selbst enthält alle Pflichtangaben nach §2 Abs.2 — ob die persönliche Erbringung durch den Wahlarzt vorlag, ist dem Beleg allein aber nicht anzusehen.",
+      kundentext:kt("Für diese Leistung wurde ein individuell vereinbartes Honorar berechnet. Wir prüfen, ob die Voraussetzungen für eine solche Vereinbarung vorlagen, bevor wir den vollen Betrag erstatten.","An individually agreed fee was charged for this service. We are checking whether the requirements for such an agreement were met before reimbursing the full amount.")});
   } else if(subtype==="analog_kapitel_m"){
     const a = b.fach.analog;
     const nl = makeAnalogPos(a, {faktor:1.0});
     addFlag(nl,"boundary","§6 Abs. 2 S. 2 GOÄneu","Analogleistung korrekt mit Präfix „A“ gekennzeichnet; die vorherige Textform-Information des Patienten ist Pflicht — außer bei Labor-Analogabrechnung nach Kapitel M I.");
     b.positionen.push(nl);
-    pp.push({status:"boundary", rule:"§6 Abs. 2 GOÄneu", title:"Analogberechnung — Informationspflicht auslegungsbedürftig", detail:"„"+a.echt+"“ wird mit Präfix „A“ entsprechend Nr. "+a.basisNr+" („"+a.basisBez+"“) abgerechnet. §6 Abs.2 S.2 verlangt grundsätzlich eine vorherige Textform-Information des Patienten; für laboratoriumsdiagnostische Analogleistungen nach Abschnitt M I gilt hiervon eine Ausnahme. Ob diese Ausnahme hier greift, hängt von der genauen Leistungsart ab."});
+    pp.push({status:"boundary", rule:"§6 Abs. 2 GOÄneu", title:"Analogberechnung — Informationspflicht auslegungsbedürftig", detail:"„"+a.echt+"“ wird mit Präfix „A“ entsprechend Nr. "+a.basisNr+" („"+a.basisBez+"“) abgerechnet. §6 Abs.2 S.2 verlangt grundsätzlich eine vorherige Textform-Information des Patienten; für laboratoriumsdiagnostische Analogleistungen nach Abschnitt M I gilt hiervon eine Ausnahme. Ob diese Ausnahme hier greift, hängt von der genauen Leistungsart ab.",
+      kundentext:kt("Diese Leistung wurde als sogenannte Analogleistung abgerechnet, da es dafür keine eigene GOÄ-Nummer gibt. Wir prüfen, ob die herangezogene Vergleichsleistung passend gewählt wurde.","This service was billed by analogy, as no dedicated GOÄ number exists for it. We are checking whether the comparable service used was appropriate.")});
   } else if(subtype==="wegegeld_25km"){
     const w = makeWegegeldPos({praefix:"W", km:25});
     addFlag(w,"boundary","§8/§9 GOÄneu","Entfernung liegt exakt auf der Grenze zwischen Wegegeld (bis 25 km) und Reiseentschädigung (über 25 km).");
     b.positionen.push(w);
-    pp.push({status:"boundary", rule:"§8 Abs. 1 Nr. 4 / §9 Abs. 1 GOÄneu", title:"Entfernung exakt auf der 25-km-Grenze", detail:"§8 GOÄneu erfasst Wegegeld ausdrücklich bis 25 km (hier: 30,00 €), §9 GOÄneu Reiseentschädigung erst „über eine Entfernung von mehr als 25 Kilometern“. Bei exakt 25 km ist nach dem Wortlaut noch Wegegeld einschlägig — ein Randfall, an dem eine automatisierte Prüfung leicht das falsche Präfix ansetzt."});
+    pp.push({status:"boundary", rule:"§8 Abs. 1 Nr. 4 / §9 Abs. 1 GOÄneu", title:"Entfernung exakt auf der 25-km-Grenze", detail:"§8 GOÄneu erfasst Wegegeld ausdrücklich bis 25 km (hier: 30,00 €), §9 GOÄneu Reiseentschädigung erst „über eine Entfernung von mehr als 25 Kilometern“. Bei exakt 25 km ist nach dem Wortlaut noch Wegegeld einschlägig — ein Randfall, an dem eine automatisierte Prüfung leicht das falsche Präfix ansetzt.",
+      kundentext:kt("Für den Hausbesuch wurde Wegegeld berechnet. Bei einer Entfernung von genau 25 km prüfen wir, ob stattdessen eine Reiseentschädigung anzusetzen ist.","Travel compensation was charged for the house call. At exactly 25 km, we are checking whether a travel allowance should apply instead.")});
   } else if(subtype==="nachtbesuch_grenze"){
     const w = makeWegegeldPos({praefix:"W", km:4, nacht:true});
     addFlag(w,"boundary","§8 Abs. 1 GOÄneu","Besuchszeit exakt auf der Grenze des Nachtzeitraums (20–8 Uhr) — entscheidet über einfachen oder Nachtsatz.");
     b.positionen.push(w);
-    pp.push({status:"boundary", rule:"§8 Abs. 1 GOÄneu", title:"Besuchszeit exakt auf der Nachtsatz-Grenze", detail:"Der Nachtsatz gilt „zwischen 20 und 8 Uhr“. Ist der Besuch für exakt 20:00 Uhr dokumentiert, hängt die Anwendung des höheren Nachtsatzes (hier 20,00 € statt 13,00 €) davon ab, ob die Grenze inklusiv oder exklusiv ausgelegt wird."});
+    pp.push({status:"boundary", rule:"§8 Abs. 1 GOÄneu", title:"Besuchszeit exakt auf der Nachtsatz-Grenze", detail:"Der Nachtsatz gilt „zwischen 20 und 8 Uhr“. Ist der Besuch für exakt 20:00 Uhr dokumentiert, hängt die Anwendung des höheren Nachtsatzes (hier 20,00 € statt 13,00 €) davon ab, ob die Grenze inklusiv oder exklusiv ausgelegt wird.",
+      kundentext:kt("Für den Besuch um 20:00 Uhr wurde der höhere Nachtsatz berechnet. Wir prüfen, ob der Besuch noch dem Tag- oder bereits dem Nachtzeitraum zuzuordnen ist.","The higher night rate was charged for the visit at 8:00 p.m. We are checking whether the visit falls within the day or the night period.")});
   } else if(subtype==="minderung_rolle"){
     b.minderung = {prozent: 15, arztRolle:"Beleg-/niedergelassener Arzt (§6a Abs. 1 S. 2 GOÄneu)"};
     addFlag(b.positionen[0],"boundary","§6a Abs. 1 GOÄneu","Minderungssatz 15 % nur korrekt, wenn tatsächlich ein Beleg- bzw. niedergelassener Arzt und kein Krankenhausarzt abrechnet.");
-    pp.push({status:"boundary", rule:"§6a Abs. 1 S. 1–2 GOÄneu", title:"Minderungssatz hängt an der Arztrolle", detail:"§6a GOÄneu sieht 25 % Minderung bei Krankenhausärzten vor, aber nur 15 % „für Leistungen … von Belegärzten oder niedergelassenen anderen Ärzten“. Der Beleg weist 15 % aus — plausibel nur, wenn die Arztrolle im Einzelfall eindeutig als Beleg-/niedergelassener Arzt und nicht als angestellter Krankenhausarzt zu werten ist."});
+    pp.push({status:"boundary", rule:"§6a Abs. 1 S. 1–2 GOÄneu", title:"Minderungssatz hängt an der Arztrolle", detail:"§6a GOÄneu sieht 25 % Minderung bei Krankenhausärzten vor, aber nur 15 % „für Leistungen … von Belegärzten oder niedergelassenen anderen Ärzten“. Der Beleg weist 15 % aus — plausibel nur, wenn die Arztrolle im Einzelfall eindeutig als Beleg-/niedergelassener Arzt und nicht als angestellter Krankenhausarzt zu werten ist.",
+      kundentext:kt("Von Ihrer Rechnung wurde ein Abschlag von 15 % vorgenommen, wie er für Belegärzte bzw. niedergelassene Ärzte gilt. Wir prüfen, ob diese Einordnung zutrifft.","A 15% reduction was applied to your invoice, as required for attending or private-practice physicians. We are checking whether this classification is correct.")});
   } else {
     b.diagnose.kennzeichen = "VA";
     addFlag(b.positionen[0],"boundary","§12 Abs. 2 Nr. 1 GOÄneu","Verdachtsdiagnose (VA) kurz vor der eigentlichen Befundabklärung — laut Gesetz nur bis dahin zulässig.");
-    pp.push({status:"boundary", rule:"§12 Abs. 2 Nr. 1 GOÄneu", title:"Verdachtsdiagnose an der Abklärungsgrenze", detail:"„"+b.diagnose.text+"“ trägt das Zusatzkennzeichen „VA“ (Verdacht auf). Laut Gesetz sind „Verdachts- und vorläufige Diagnosen … nur bis zur Befundabklärung aufzuführen“ — der Beleg liegt hier an genau dieser zeitlichen Grenze."});
+    pp.push({status:"boundary", rule:"§12 Abs. 2 Nr. 1 GOÄneu", title:"Verdachtsdiagnose an der Abklärungsgrenze", detail:"„"+b.diagnose.text+"“ trägt das Zusatzkennzeichen „VA“ (Verdacht auf). Laut Gesetz sind „Verdachts- und vorläufige Diagnosen … nur bis zur Befundabklärung aufzuführen“ — der Beleg liegt hier an genau dieser zeitlichen Grenze.",
+      kundentext:kt("Die angegebene Diagnose ist als Verdachtsdiagnose gekennzeichnet. Wir prüfen, ob zum Behandlungszeitpunkt bereits eine gesicherte Diagnose vorlag.","The diagnosis given is marked as a suspected diagnosis. We are checking whether a confirmed diagnosis was already available at the time of treatment.")});
   }
   return {pp, outcome:"Erwartetes Systemverhalten: gesetzlich zulässig, aber auslegungsbedürftig — zur manuellen Prüfung markieren, nicht automatisiert ablehnen."};
 }
@@ -753,39 +808,54 @@ function applyVerstoss(b){
       const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
       p.titel = "";
       addFlag(p,"violation","§12 Abs. 2 Nr. 3 GOÄneu","Titel der Leistungslegende/Kurzbezeichnung fehlt — Pflichtangabe.");
-      pp.push({status:"violation", rule:"§12 Abs. 2 Nr. 3 GOÄneu", title:"Titel der Leistungslegende fehlt", detail:"Zu GOÄ-Nr. "+p.goaeNr+" fehlt der für den Patienten verständliche Titel bzw. die Kurzbezeichnung der Leistung. Das Gesetz verlangt „bei Leistungen deren Nummer, die Anzahl und den Titel der Leistungslegende“."});
+      pp.push({status:"violation", rule:"§12 Abs. 2 Nr. 3 GOÄneu", title:"Titel der Leistungslegende fehlt", detail:"Zu GOÄ-Nr. "+p.goaeNr+" fehlt der für den Patienten verständliche Titel bzw. die Kurzbezeichnung der Leistung. Das Gesetz verlangt „bei Leistungen deren Nummer, die Anzahl und den Titel der Leistungslegende“.",
+        kundentext:kt("Zu einer abgerechneten Leistung fehlt die Leistungsbezeichnung, sodass wir nicht nachvollziehen können, was genau erbracht wurde.","The description of one billed service is missing, so we cannot determine what exactly was provided."),
+        korrektur:{typ:"streichen", posId:p.id}});
     } else if(subtype==="analog_ohne_praefix"){
       const a = b.fach.analog;
       const nl = makeAnalogPos(a, {faktor:1.0, analogPrefix:false});
       nl.praefixe = [];
       addFlag(nl,"violation","§12 Abs. 4 Nr. 6 / Abs. 5 GOÄneu","Analog erbrachte Leistung ohne Präfix „A“ abgerechnet — Nummer und Bezeichnung der als gleichwertig erachteten Leistung fehlen der Kennzeichnung.");
       b.positionen.push(nl);
-      pp.push({status:"violation", rule:"§12 Abs. 4 Nr. 6 / Abs. 5 GOÄneu", title:"Analogleistung nicht als solche gekennzeichnet", detail:"„"+a.echt+"“ wird über Nr. "+a.basisNr+" abgerechnet, ohne das Präfix „A“ zu setzen. §12 Abs.5 verlangt, dass die entsprechend bewertete Leistung „für den Zahlungspflichtigen verständlich“ sowie Nummer und Bezeichnung der als gleichwertig erachteten Leistung angegeben werden."});
+      pp.push({status:"violation", rule:"§12 Abs. 4 Nr. 6 / Abs. 5 GOÄneu", title:"Analogleistung nicht als solche gekennzeichnet", detail:"„"+a.echt+"“ wird über Nr. "+a.basisNr+" abgerechnet, ohne das Präfix „A“ zu setzen. §12 Abs.5 verlangt, dass die entsprechend bewertete Leistung „für den Zahlungspflichtigen verständlich“ sowie Nummer und Bezeichnung der als gleichwertig erachteten Leistung angegeben werden.",
+        kundentext:kt("Eine Leistung wurde nach einer vergleichbaren GOÄ-Nummer abgerechnet, ohne dies als sogenannte Analogleistung zu kennzeichnen. Ohne diese Kennzeichnung können wir die Abrechnung nicht nachvollziehen.","A service was billed under a comparable GOÄ number without being marked as an analogous service. Without this label we cannot verify the billing."),
+        korrektur:{typ:"streichen", posId:nl.id}});
     } else if(subtype==="diagnose_fehlt_unbegruendet"){
       b.diagnose.text = ""; b.diagnose.icd = ""; b.diagnose.entfaellt = false; b.diagnose.entfaelltGrund = null;
       b.diagnoseFlag = true;
-      pp.push({status:"violation", rule:"§12 Abs. 2 Nr. 1 GOÄneu (Pflichtangabe)", title:"Diagnoseangabe fehlt ohne erkennbaren Ausnahmegrund", detail:"Der Beleg enthält weder ICD-Code noch Klartext-Diagnose. Anders als beim Ausnahmefall „schutzwürdige Interessen“ ist hier kein Grund für das Entfallen dokumentiert — die Leistungen sind medizinisch nicht nachvollziehbar."});
+      pp.push({status:"violation", rule:"§12 Abs. 2 Nr. 1 GOÄneu (Pflichtangabe)", title:"Diagnoseangabe fehlt ohne erkennbaren Ausnahmegrund", detail:"Der Beleg enthält weder ICD-Code noch Klartext-Diagnose. Anders als beim Ausnahmefall „schutzwürdige Interessen“ ist hier kein Grund für das Entfallen dokumentiert — die Leistungen sind medizinisch nicht nachvollziehbar.",
+        kundentext:kt("Zu Ihrer Rechnung liegt keine Diagnose vor, sodass wir die medizinische Notwendigkeit der abgerechneten Leistungen nicht prüfen können.","No diagnosis was provided with your invoice, so we cannot assess the medical necessity of the billed services."),
+        korrektur:{typ:"gesamt"}});
     } else if(subtype==="ab_ohne_konkretisierung"){
       const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
       p.faktorGrund = ["AB"]; p.faktor = 1.5; p.betrag = round2((Z[Object.keys(Z).find(k=>Z[k].nr===p.goaeNr)]||{satz1:p.betrag}).satz1*1.5);
       p.begruendung = "Erhöhter Aufwand.";
       addFlag(p,"violation","Kap. 3.9 Faktor-Grund „AB“","Faktor-Grund „AB“ gesetzt, aber die konkrete Allgemeine Bestimmung wird in der Begründung nicht benannt.");
-      pp.push({status:"violation", rule:"Kap. 3.9 Faktor-Grund „AB“", title:"Abrechnungsbestimmung nicht konkretisiert", detail:"Bei Faktor-Grund „AB“ verlangt das Rechnungsformular ausdrücklich, dass „die konkrete Allgemeine Bestimmung oder Abrechnungsbestimmung … in der Begründung anzugeben“ ist. Hier steht nur „Erhöhter Aufwand.“ — das erfüllt die Vorgabe nicht."});
+      pp.push({status:"violation", rule:"Kap. 3.9 Faktor-Grund „AB“", title:"Abrechnungsbestimmung nicht konkretisiert", detail:"Bei Faktor-Grund „AB“ verlangt das Rechnungsformular ausdrücklich, dass „die konkrete Allgemeine Bestimmung oder Abrechnungsbestimmung … in der Begründung anzugeben“ ist. Hier steht nur „Erhöhter Aufwand.“ — das erfüllt die Vorgabe nicht.",
+        kundentext:kt("Für einen erhöhten Rechnungsbetrag fehlt die Angabe, auf welche Regelung sich die Erhöhung stützt. Ohne diese Angabe können wir nur den regulären Gebührensatz erstatten.","For an increased invoice amount, there is no indication of which rule justifies the increase. Without this information we can only reimburse the standard fee."),
+        korrektur:{typ:"faktor", posId:p.id}});
     } else if(subtype==="rechenfehler"){
       b.summenFehler = round2(randInt(3,18) + Math.random());
-      pp.push({status:"violation", rule:"§12 Abs. 2 Nr. 2 GOÄneu / Tabellenfuß", title:"Gesamtrechnungsbetrag stimmt nicht mit den Einzelpositionen überein", detail:"Der ausgewiesene Gesamtrechnungsbetrag weicht von der rechnerisch korrekten Summe der Einzelpositionen um "+euro(b.summenFehler)+" ab."});
+      pp.push({status:"violation", rule:"§12 Abs. 2 Nr. 2 GOÄneu / Tabellenfuß", title:"Gesamtrechnungsbetrag stimmt nicht mit den Einzelpositionen überein", detail:"Der ausgewiesene Gesamtrechnungsbetrag weicht von der rechnerisch korrekten Summe der Einzelpositionen um "+euro(b.summenFehler)+" ab.",
+        kundentext:kt("Die Summe der Einzelpositionen ergibt einen anderen Betrag als den ausgewiesenen Rechnungsbetrag. Wir legen daher den rechnerisch korrekten Betrag zugrunde.","The sum of the individual items does not match the stated invoice total. We therefore apply the mathematically correct amount."),
+        korrektur:{typ:"rechenfehler"}});
     } else if(subtype==="sachkosten_unzulaessig"){
       let sk = b.positionen.find(p=>p.kind==="sachkosten");
       if(!sk){ sk = makeSachkostenPos({unzulaessig:true}); b.positionen.push(sk); }
       else { sk.begruendung = pick(SACHKOSTEN_UNZULAESSIG); }
       addFlag(sk,"violation","§10 Abs. 2 GOÄneu","Diese Auslage ist im Gesetz ausdrücklich von der gesonderten Berechnung ausgeschlossen.");
-      pp.push({status:"violation", rule:"§10 Abs. 2 GOÄneu", title:"Nicht berechnungsfähige Auslage abgerechnet", detail:"„"+sk.begruendung+"“ steht wortgleich auf der Ausschlussliste des §10 Abs.2 GOÄneu (u. a. Einmalspritzen, -kanülen, -handschuhe, Schnellverbandmaterial, Desinfektionsmittel). Diese Kosten sind mit der Gebühr bereits abgegolten und dürfen nicht gesondert als Auslage (Präfix „E“) berechnet werden."});
+      pp.push({status:"violation", rule:"§10 Abs. 2 GOÄneu", title:"Nicht berechnungsfähige Auslage abgerechnet", detail:"„"+sk.begruendung+"“ steht wortgleich auf der Ausschlussliste des §10 Abs.2 GOÄneu (u. a. Einmalspritzen, -kanülen, -handschuhe, Schnellverbandmaterial, Desinfektionsmittel). Diese Kosten sind mit der Gebühr bereits abgegolten und dürfen nicht gesondert als Auslage (Präfix „E“) berechnet werden.",
+        kundentext:kt("Die abgerechnete Auslage gehört zu den Kosten, die bereits mit der ärztlichen Gebühr abgegolten sind, und darf deshalb nicht zusätzlich berechnet werden.","The billed expense is among the costs already covered by the medical fee and therefore cannot be charged separately."),
+        korrektur:{typ:"streichen", posId:sk.id}});
     } else if(subtype==="hv_verbotenes_kapitel"){
       const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
       p.faktorGrund = ["HV"]; p.faktor = 2.5;
+      p.betrag = round2(p.satz1*p.faktor);
       p.begruendung = "Honorarvereinbarung: Faktor 2,5 (Leistung aus Kapitel M).";
       addFlag(p,"violation","§2 Abs. 1 S. 2 GOÄneu","Honorarvereinbarung für eine Leistung aus Kapitel M — für die Kapitel E, M, N und O ist eine solche Vereinbarung ausdrücklich unzulässig.");
-      pp.push({status:"violation", rule:"§2 Abs. 1 S. 2 GOÄneu", title:"Honorarvereinbarung in einem gesetzlich ausgeschlossenen Kapitel", detail:"§2 Abs.1 S.2 GOÄneu schließt eine abweichende Vereinbarung „für Leistungen nach den Kapiteln E, M, N und O“ ausdrücklich aus. Für Nr. "+p.goaeNr+" ist dennoch eine Honorarvereinbarung mit Faktor 2,5 hinterlegt — unzulässig."});
+      pp.push({status:"violation", rule:"§2 Abs. 1 S. 2 GOÄneu", title:"Honorarvereinbarung in einem gesetzlich ausgeschlossenen Kapitel", detail:"§2 Abs.1 S.2 GOÄneu schließt eine abweichende Vereinbarung „für Leistungen nach den Kapiteln E, M, N und O“ ausdrücklich aus. Für Nr. "+p.goaeNr+" ist dennoch eine Honorarvereinbarung mit Faktor 2,5 hinterlegt — unzulässig.",
+        kundentext:kt("Für diese Leistung wurde ein individuell erhöhtes Honorar vereinbart, obwohl das für diese Art von Leistung nicht zulässig ist. Wir erstatten daher nur den regulären Gebührensatz.","An individually increased fee was agreed for this service, although this is not permitted for this type of service. We therefore reimburse only the standard fee."),
+        korrektur:{typ:"faktor", posId:p.id}});
     }
   });
   return {pp, outcome:"Erwartetes Systemverhalten: Beleg wird zurückgewiesen bzw. es wird eine Nachforderung an die Praxis ausgelöst."};
@@ -798,25 +868,29 @@ function applyAusnahme(b){
     const nachtbesuch = makeWegegeldPos({praefix:"W", km:6, nacht:true, begruendung:"Notfallbesuch, Entfernung 6 km, Nachtbesuch (20–8 Uhr) — dringende Behandlung ohne vorherige Honorarvereinbarung (§ 8 GOÄneu)"});
     b.positionen.push(nachtbesuch);
     addFlag(nachtbesuch,"exception","§2 Abs. 1 S. 4 GOÄneu","Notfallbehandlung ausdrücklich von der sonst möglichen Honorarvereinbarungspflicht ausgenommen.");
-    pp.push({status:"exception", rule:"§2 Abs. 1 S. 4 GOÄneu", title:"Notfallbehandlung ohne Honorarvereinbarung", detail:"„Notfall- und akute Schmerzbehandlungen dürfen nicht von einer Vereinbarung [nach § 2] abhängig gemacht werden.“ Der Besuch wird daher zum regulären, nicht individuell vereinbarten Satz abgerechnet, obwohl der Aufwand (Nachtbesuch) hoch war — im Notfall zulässig und sogar geboten."});
+    pp.push({status:"exception", rule:"§2 Abs. 1 S. 4 GOÄneu", title:"Notfallbehandlung ohne Honorarvereinbarung", detail:"„Notfall- und akute Schmerzbehandlungen dürfen nicht von einer Vereinbarung [nach § 2] abhängig gemacht werden.“ Der Besuch wird daher zum regulären, nicht individuell vereinbarten Satz abgerechnet, obwohl der Aufwand (Nachtbesuch) hoch war — im Notfall zulässig und sogar geboten.",
+      kundentext:kt("Weil es sich um eine dringende Behandlung außerhalb der üblichen Zeiten handelte, war vorab keine Honorarvereinbarung erforderlich. Die Leistung wird zum regulären Satz erstattet.","As this was an urgent treatment outside usual hours, no prior fee agreement was required. The service is reimbursed at the standard rate.")});
   } else if(subtype==="diagnose_schutzwuerdig"){
     const variante = pick(["schwangerschaftsabbruch","arbeitsmedizin"]);
     if(variante==="schwangerschaftsabbruch"){
       const erzieh = generatePerson();
       b.empfaenger = erzieh;
       b.diagnose = {text:"", icd:"", kennzeichen:null, entfaellt:true, entfaelltGrund:"Schutzwürdige Interessen der Patientin (minderjährig) — Rechnungsempfänger ist die erziehungsberechtigte, zugleich zahlungspflichtige Person"};
-      pp.push({status:"exception", rule:"§12 Abs. 2 Nr. 1 GOÄneu", title:"Diagnoseangabe entfällt bei schutzwürdigen Interessen", detail:"Rechnungsempfänger ("+erzieh.vorname+" "+erzieh.nachname+") und Patientin sind nicht identisch. Das Gesetz ordnet an: „die Angaben sind nicht erforderlich, sofern schutzwürdige Interessen des Patienten entgegenstehen“ — die Ausfüllhinweise nennen als Beispiel ausdrücklich Schwangerschaftsabbrüche."});
+      pp.push({status:"exception", rule:"§12 Abs. 2 Nr. 1 GOÄneu", title:"Diagnoseangabe entfällt bei schutzwürdigen Interessen", detail:"Rechnungsempfänger ("+erzieh.vorname+" "+erzieh.nachname+") und Patientin sind nicht identisch. Das Gesetz ordnet an: „die Angaben sind nicht erforderlich, sofern schutzwürdige Interessen des Patienten entgegenstehen“ — die Ausfüllhinweise nennen als Beispiel ausdrücklich Schwangerschaftsabbrüche.",
+        kundentext:kt("Aus Gründen des Persönlichkeitsschutzes wurde auf diesem Beleg bewusst keine Diagnose angegeben. Das ist in begründeten Fällen zulässig und beeinträchtigt die Bearbeitung Ihrer Rechnung nicht.","For reasons of personal privacy, no diagnosis was deliberately stated on this document. This is permitted in justified cases and does not affect the processing of your invoice.")});
     } else {
       const arbeitgeber = generatePerson();
       b.empfaenger = {anrede:"", vorname:"", nachname:arbeitgeber.nachname+" GmbH (Arbeitgeberin)", strasse:arbeitgeber.strasse, plz:arbeitgeber.plz, ort:arbeitgeber.ort};
       b.diagnose = {text:"", icd:"", kennzeichen:null, entfaellt:true, entfaelltGrund:"Schutzwürdige Interessen des Arbeitnehmers — Zahlungspflichtiger ist der Arbeitgeber (arbeitsmedizinische Untersuchung)"};
-      pp.push({status:"exception", rule:"§12 Abs. 2 Nr. 1 GOÄneu", title:"Diagnoseangabe entfällt bei arbeitsmedizinischer Untersuchung", detail:"Rechnungsempfänger ist die Arbeitgeberin, nicht der untersuchte Patient. Der Arbeitgeber soll laut Ausfüllhinweisen keinen Einblick in Befunde/Diagnosen erhalten — die Diagnoseangabe entfällt hier zulässigerweise wegen schutzwürdiger Interessen des Patienten."});
+      pp.push({status:"exception", rule:"§12 Abs. 2 Nr. 1 GOÄneu", title:"Diagnoseangabe entfällt bei arbeitsmedizinischer Untersuchung", detail:"Rechnungsempfänger ist die Arbeitgeberin, nicht der untersuchte Patient. Der Arbeitgeber soll laut Ausfüllhinweisen keinen Einblick in Befunde/Diagnosen erhalten — die Diagnoseangabe entfällt hier zulässigerweise wegen schutzwürdiger Interessen des Patienten.",
+        kundentext:kt("Da es sich um eine arbeitsmedizinische Untersuchung handelt, wird aus Datenschutzgründen bewusst keine Diagnose angegeben. Das ist zulässig und beeinträchtigt die Bearbeitung Ihrer Rechnung nicht.","As this is an occupational health examination, no diagnosis is deliberately stated for data-protection reasons. This is permitted and does not affect the processing of your invoice.")});
     }
   } else {
     const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
     p.praefixe = Array.from(new Set([...(p.praefixe||[]), "V"]));
     addFlag(p,"exception","§1 Abs. 2 S. 2 GOÄneu","Verlangensleistung — geht über die medizinisch notwendige Versorgung hinaus, berechnungsfähig nur auf ausdrücklichen Patientenwunsch.");
-    pp.push({status:"exception", rule:"§1 Abs. 2 S. 2 GOÄneu", title:"Verlangensleistung (Präfix „V“)", detail:"„"+p.titel+"“ ist mit Präfix „V“ gekennzeichnet: eine Leistung, die über das medizinisch notwendige Maß hinausgeht und ausschließlich deshalb berechnet werden darf, weil die Patientin/der Patient sie ausdrücklich verlangt hat. Vor Erbringung war der Patient zudem in Textform über die voraussichtliche Honorarhöhe zu informieren (§1 Abs.2 S.3)."});
+    pp.push({status:"exception", rule:"§1 Abs. 2 S. 2 GOÄneu", title:"Verlangensleistung (Präfix „V“)", detail:"„"+p.titel+"“ ist mit Präfix „V“ gekennzeichnet: eine Leistung, die über das medizinisch notwendige Maß hinausgeht und ausschließlich deshalb berechnet werden darf, weil die Patientin/der Patient sie ausdrücklich verlangt hat. Vor Erbringung war der Patient zudem in Textform über die voraussichtliche Honorarhöhe zu informieren (§1 Abs.2 S.3).",
+      kundentext:kt("Diese Leistung ging über das medizinisch notwendige Maß hinaus und wurde ausdrücklich auf Ihren Wunsch erbracht. Solche Leistungen sind ggf. nicht oder nur teilweise erstattungsfähig.","This service went beyond what was medically necessary and was provided at your explicit request. Such services may not be reimbursable, or only in part.")});
   }
   return {pp, outcome:"Erwartetes Systemverhalten: abweichende Bearbeitung ist zulässig, sofern der im Formular vorgesehene Ausnahmetatbestand (hier: Präfix bzw. dokumentierter Grund) erkennbar ist — keine automatische Ablehnung."};
 }
@@ -830,25 +904,30 @@ function applyKonflikt(b){
     b.positionen.push(w,r);
     addFlag(w,"conflict","§8/§9 GOÄneu","Wegegeld und Reiseentschädigung gleichzeitig abgerechnet — Reiseentschädigung tritt laut Gesetz an die Stelle des Wegegelds.");
     addFlag(r,"conflict","§8/§9 GOÄneu","Wegegeld und Reiseentschädigung gleichzeitig abgerechnet — Reiseentschädigung tritt laut Gesetz an die Stelle des Wegegelds.");
-    pp.push({status:"conflict", rule:"§9 Abs. 1 GOÄneu", title:"Wegegeld und Reiseentschädigung gleichzeitig", detail:"Beide Positionen erscheinen im selben Beleg. §9 Abs.1 GOÄneu ordnet an: „Bei Besuchen über eine Entfernung von mehr als 25 Kilometern … tritt an die Stelle des Wegegeldes eine Reiseentschädigung“ — beide nebeneinander für denselben Besuch sind ein struktureller Widerspruch."});
+    pp.push({status:"conflict", rule:"§9 Abs. 1 GOÄneu", title:"Wegegeld und Reiseentschädigung gleichzeitig", detail:"Beide Positionen erscheinen im selben Beleg. §9 Abs.1 GOÄneu ordnet an: „Bei Besuchen über eine Entfernung von mehr als 25 Kilometern … tritt an die Stelle des Wegegeldes eine Reiseentschädigung“ — beide nebeneinander für denselben Besuch sind ein struktureller Widerspruch.",
+      kundentext:kt("Für denselben Besuch wurden sowohl Wegegeld als auch eine Reiseentschädigung berechnet. Da nur eine der beiden Positionen zulässig ist, klären wir, welche davon zutrifft.","Both travel compensation and a travel allowance were charged for the same visit. As only one of the two applies, we are clarifying which one is correct.")});
   } else if(subtype==="unbekannter_arzt"){
     const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
     p.arztNr = 2;
     addFlag(p,"conflict","Kap. 3.5/3.9 lfd. Nr. Ärztin/Arzt","Verweist auf Arzt-Nr. 2, die in der Tabelle „Verantwortliche Ärztin/Arzt“ nicht existiert.");
-    pp.push({status:"conflict", rule:"Kap. 3.5 / 3.9 lfd. Nr. Ärztin/Arzt", title:"Leistungsposition referenziert unbekannte Arzt-Nummer", detail:"Position „"+p.titel+"“ trägt die laufende Nummer 2, im Block „Verantwortliche Ärztin/verantwortlicher Arzt“ ist aber nur Nr. 1 hinterlegt. Die Zuordnungslogik des Formulars ist damit inkonsistent."});
+    pp.push({status:"conflict", rule:"Kap. 3.5 / 3.9 lfd. Nr. Ärztin/Arzt", title:"Leistungsposition referenziert unbekannte Arzt-Nummer", detail:"Position „"+p.titel+"“ trägt die laufende Nummer 2, im Block „Verantwortliche Ärztin/verantwortlicher Arzt“ ist aber nur Nr. 1 hinterlegt. Die Zuordnungslogik des Formulars ist damit inkonsistent.",
+      kundentext:kt("Eine abgerechnete Leistung lässt sich keiner der angegebenen verantwortlichen Ärztinnen bzw. Ärzte eindeutig zuordnen. Wir klären dies vor der weiteren Bearbeitung.","One billed service cannot be clearly assigned to any of the responsible physicians listed. We will clarify this before further processing.")});
   } else if(subtype==="analog_trotz_eigennummer"){
     const a = b.fach.analog;
     const nl = makeAnalogPos(a, {faktor:1.0});
     nl.goaeNr = pick(b.fach.ziffern).nr;
     addFlag(nl,"conflict","§6 Abs. 2 GOÄneu","Präfix „A“ gesetzt, obwohl eine eigene GOÄ-Nummer für dieselbe Leistung angegeben ist — Analogberechnung setzt gerade das Fehlen einer eigenen Nummer voraus.");
     b.positionen.push(nl);
-    pp.push({status:"conflict", rule:"§6 Abs. 2 S. 1 GOÄneu", title:"Analogkennzeichnung trotz vorhandener eigener Nummer", detail:"Eine Analogabrechnung ist nach §6 Abs.2 S.1 GOÄneu nur zulässig, „solange sie noch nicht in das Gebührenverzeichnis aufgenommen sind“. Hier ist zugleich eine reguläre, eigenständige GOÄ-Nummer für dieselbe Leistung angegeben — ein inhaltlicher Widerspruch."});
+    pp.push({status:"conflict", rule:"§6 Abs. 2 S. 1 GOÄneu", title:"Analogkennzeichnung trotz vorhandener eigener Nummer", detail:"Eine Analogabrechnung ist nach §6 Abs.2 S.1 GOÄneu nur zulässig, „solange sie noch nicht in das Gebührenverzeichnis aufgenommen sind“. Hier ist zugleich eine reguläre, eigenständige GOÄ-Nummer für dieselbe Leistung angegeben — ein inhaltlicher Widerspruch.",
+      kundentext:kt("Eine Leistung wurde sowohl mit einer eigenen GOÄ-Nummer als auch als Analogleistung gekennzeichnet. Das ist widersprüchlich, da eine Analogabrechnung nur ohne eigene Nummer zulässig ist.","A service was marked both with its own GOÄ number and as an analogous service. This is contradictory, since analogous billing is only permitted when no dedicated number exists.")});
   } else {
     const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
     p.faktorGrund = ["HV","AB"];
     p.faktor = round2(1.5*0.9);
+    p.betrag = round2(p.satz1*p.faktor);
     addFlag(p,"conflict","§2 Abs. 2 GOÄneu · Faktor-Grund „HV“","Honorarvereinbarung (HV) mit weiterem Faktor-Grund kombiniert und multipliziert.");
-    pp.push({status:"conflict", rule:"§2 Abs. 2 GOÄneu · Faktor-Grund „HV“", title:"Honorarvereinbarung mit zusätzlicher Faktor-Multiplikation", detail:"Nach §2 Abs.2 GOÄneu legt die Honorarvereinbarung „den Faktor“ für eine bestimmte Leistung individuell fest — das Rechnungsformular stellt klar: „Bei Honorarvereinbarungen gilt der dort vereinbarte Faktor. Eine Multiplikation findet nicht statt.“ Hier ist „HV“ aber zusammen mit „AB“ angegeben und beide Faktoren wurden multipliziert — das widerspricht dem Konzept der Individualvereinbarung."});
+    pp.push({status:"conflict", rule:"§2 Abs. 2 GOÄneu · Faktor-Grund „HV“", title:"Honorarvereinbarung mit zusätzlicher Faktor-Multiplikation", detail:"Nach §2 Abs.2 GOÄneu legt die Honorarvereinbarung „den Faktor“ für eine bestimmte Leistung individuell fest — das Rechnungsformular stellt klar: „Bei Honorarvereinbarungen gilt der dort vereinbarte Faktor. Eine Multiplikation findet nicht statt.“ Hier ist „HV“ aber zusammen mit „AB“ angegeben und beide Faktoren wurden multipliziert — das widerspricht dem Konzept der Individualvereinbarung.",
+      kundentext:kt("Für diese Leistung wurde sowohl ein individuell vereinbartes Honorar als auch ein zusätzlicher Zuschlag berechnet. Da bei einer Honorarvereinbarung kein weiterer Zuschlag zulässig ist, klären wir den korrekten Betrag.","Both an individually agreed fee and an additional surcharge were charged for this service. As no further surcharge is permitted alongside a fee agreement, we are clarifying the correct amount.")});
   }
   return {pp, outcome:"Erwartetes Systemverhalten: automatisierte Prüfung markiert einen Regelkonflikt zur Entscheidung — weder automatische Annahme noch automatische Ablehnung."};
 }
@@ -865,6 +944,83 @@ function classify(base, kategorie){
   else if(kategorie==="ausnahme") result = applyAusnahme(b);
   else result = applyKonflikt(b);
   return {beleg:b, pp:result.pp, outcome:result.outcome};
+}
+
+/* ========================= Kundentexte: Ablehnung / Kürzung ========================= */
+function anredeText(person){
+  if(!person || !person.nachname || person.vorname===""){
+    return {de:"Sehr geehrte Damen und Herren,", en:"Dear Sir or Madam,"};
+  }
+  const frau = person.anrede==="Frau";
+  return {
+    de: "Sehr geehrte"+(frau?" Frau ":"r Herr ")+person.nachname+",",
+    en: "Dear "+(frau?"Ms. ":"Mr. ")+person.nachname+",",
+  };
+}
+
+function berechneKuerzung(beleg, pp){
+  const positions = JSON.parse(JSON.stringify(beleg.positionen));
+  const zeilen = [];
+  let blockedAll = false;
+  pp.forEach(item=>{
+    if(!item.korrektur) return;
+    const k = item.korrektur;
+    if(k.typ==="gesamt"){ blockedAll = true; zeilen.push({titel:null, alt:null, neu:null, grundDe:item.kundentext.de, grundEn:item.kundentext.en, gesamt:true}); return; }
+    if(k.typ==="rechenfehler"){ zeilen.push({titel:null, alt:null, neu:null, grundDe:item.kundentext.de, grundEn:item.kundentext.en}); return; }
+    const pos = positions.find(x=>x.id===k.posId);
+    if(!pos) return;
+    const neu = k.typ==="streichen" ? 0 : (pos.satz1!==undefined ? pos.satz1 : pos.betrag);
+    zeilen.push({titel:pos.titel||("GOÄ-Nr. "+pos.goaeNr), alt:pos.betrag, neu, grundDe:item.kundentext.de, grundEn:item.kundentext.en});
+    pos.betrag = neu;
+  });
+  const altGesamt = round2(summen(beleg).gesamt - (beleg.summenFehler||0));
+  let neuGesamt;
+  if(blockedAll){ neuGesamt = 0; }
+  else { const neuBeleg = Object.assign({}, beleg, {positionen:positions}); neuGesamt = round2(summen(neuBeleg).gesamt); }
+  return {zeilen, altGesamt, neuGesamt, diff: round2(altGesamt-neuGesamt)};
+}
+
+function buildAblehnungstext(beleg, pp){
+  const empf = beleg.empfaenger || beleg.patient;
+  const an = anredeText(empf);
+  const items = pp.filter(x=>x.status==="violation");
+  const gesamt = round2(summen(beleg).gesamt - (beleg.summenFehler||0));
+  const listDe = items.map(x=>"– "+x.kundentext.de).join("\n");
+  const listEn = items.map(x=>"– "+x.kundentext.en).join("\n");
+  const de = an.de+"\n\n"+
+    "vielen Dank für die Einreichung Ihrer Rechnung Nr. "+beleg.id+" vom "+fmtDate(beleg.rechnungsdatum)+" über "+euro(gesamt)+".\n\n"+
+    "Leider können wir die Rechnung in der eingereichten Form nicht erstatten:\n\n"+listDe+"\n\n"+
+    "Bitte reichen Sie uns eine korrigierte bzw. vervollständigte Rechnung ein. Nach Eingang prüfen wir den Vorgang umgehend erneut.\n\n"+
+    "Bei Rückfragen erreichen Sie uns über die auf Ihrer Police angegebenen Kontaktdaten.\n\n"+
+    "Mit freundlichen Grüßen\nIhre Continentale Krankenversicherung";
+  const en = an.en+"\n\n"+
+    "thank you for submitting your invoice no. "+beleg.id+" dated "+fmtDate(beleg.rechnungsdatum)+" for "+euro(gesamt)+".\n\n"+
+    "Unfortunately, we are unable to reimburse this invoice as submitted:\n\n"+listEn+"\n\n"+
+    "Please submit a corrected or completed invoice. We will review the matter again promptly upon receipt.\n\n"+
+    "If you have any questions, please contact us using the details shown on your policy.\n\n"+
+    "Kind regards,\nYour Continentale health insurance";
+  return {de, en, betreffDe:"Ablehnung der Rechnung Nr. "+beleg.id, betreffEn:"Rejection of invoice no. "+beleg.id};
+}
+
+function buildKuerzungstext(beleg, pp){
+  const empf = beleg.empfaenger || beleg.patient;
+  const an = anredeText(empf);
+  const {zeilen, altGesamt, neuGesamt, diff} = berechneKuerzung(beleg, pp);
+  const lineDe = z => z.gesamt ? "– "+z.grundDe : "– "+(z.titel?z.titel+": ":"")+(z.alt!==null?euro(z.alt)+" → "+euro(z.neu)+" – ":"")+z.grundDe;
+  const lineEn = z => z.gesamt ? "– "+z.grundEn : "– "+(z.titel?z.titel+": ":"")+(z.alt!==null?euro(z.alt)+" → "+euro(z.neu)+" – ":"")+z.grundEn;
+  const zeilenDe = zeilen.map(lineDe).join("\n");
+  const zeilenEn = zeilen.map(lineEn).join("\n");
+  const de = an.de+"\n\n"+
+    "wir haben Ihre Rechnung Nr. "+beleg.id+" vom "+fmtDate(beleg.rechnungsdatum)+" über "+euro(altGesamt)+" geprüft. Aus den folgenden Gründen mussten wir den erstattungsfähigen Betrag anpassen:\n\n"+zeilenDe+"\n\n"+
+    "Bisheriger Rechnungsbetrag: "+euro(altGesamt)+"\nErstattungsfähiger Betrag: "+euro(neuGesamt)+"\nDifferenz: "+euro(diff)+"\n\n"+
+    "Den erstattungsfähigen Betrag überweisen wir in Kürze auf das uns bekannte Konto. Für die Differenz können Sie uns bei Bedarf ergänzende Unterlagen nachreichen.\n\n"+
+    "Mit freundlichen Grüßen\nIhre Continentale Krankenversicherung";
+  const en = an.en+"\n\n"+
+    "we have reviewed your invoice no. "+beleg.id+" dated "+fmtDate(beleg.rechnungsdatum)+" for "+euro(altGesamt)+". For the reasons below, we had to adjust the reimbursable amount:\n\n"+zeilenEn+"\n\n"+
+    "Previous invoice amount: "+euro(altGesamt)+"\nReimbursable amount: "+euro(neuGesamt)+"\nDifference: "+euro(diff)+"\n\n"+
+    "We will transfer the reimbursable amount to the account on file shortly. If you wish, you may submit further documentation regarding the difference.\n\n"+
+    "Kind regards,\nYour Continentale health insurance";
+  return {de, en, betreffDe:"Kürzung der Rechnung Nr. "+beleg.id, betreffEn:"Reduction of invoice no. "+beleg.id};
 }
 
 /* ========================= Rendering: Beleg ========================= */
@@ -1048,23 +1204,44 @@ function renderClassification(kategorie, result){
   panel.style.setProperty("--cp-bg","var("+m.bgVar+")");
   const items = result.pp.map(p=>{
     const colorVar = p.status==="ok"?"--cat-ok":p.status==="boundary"?"--cat-boundary":p.status==="violation"?"--cat-violation":p.status==="exception"?"--cat-exception":"--cat-conflict";
+    const ktHtml = p.kundentext ? (
+      '<div class="kt-block">'+
+        '<div class="kt-col"><span class="kt-lang">Kundentext DE</span>'+esc(p.kundentext.de)+'</div>'+
+        '<div class="kt-col"><span class="kt-lang">Customer text EN</span>'+esc(p.kundentext.en)+'</div>'+
+      '</div>'
+    ) : "";
     return '<div class="cp-item" style="--item-color:var('+colorVar+')">'+
       '<span class="icon">'+ICONS[p.status]+'</span>'+
-      '<div><div class="rule">'+esc(p.rule)+'</div><div class="title">'+esc(p.title)+'</div><div class="detail">'+esc(p.detail)+'</div></div>'+
+      '<div><div class="rule">'+esc(p.rule)+'</div><div class="title">'+esc(p.title)+'</div><div class="detail">'+esc(p.detail)+'</div>'+ktHtml+'</div>'+
     '</div>';
   }).join("");
+  const actionsHtml = kategorie==="verstoss" ?
+    '<div class="cp-actions">'+
+      '<span class="cp-actions-label">Empfohlene Aktion für diesen Beleg:</span>'+
+      '<button class="btn btn-reject" id="btn-ablehnen" type="button">'+ICONS.violation+'Ablehnen</button>'+
+      '<button class="btn btn-reduce" id="btn-kuerzen" type="button">'+ICONS.boundary+'Kürzen</button>'+
+    '</div>'+
+    '<div class="letter-panel" id="letter-panel" hidden></div>'
+    : "";
   panel.innerHTML =
     '<div class="cp-head">'+
       '<span class="cp-badge" style="--cp-fg:var('+m.colorVar+');--cp-bg:var('+m.bgVar+')">'+m.icon+m.label+'</span>'+
       '<div><h2 class="cp-title">Einordnung</h2><p class="cp-sub">Geprüfte Rechnungsinhalte für diesen Testfall</p></div>'+
     '</div>'+
     '<div class="cp-grid">'+items+'</div>'+
-    '<div class="cp-outcome" style="--cp-fg:var('+m.colorVar+');--cp-bg:var('+m.bgVar+')"><span>'+m.icon+'</span><div><b>Systemverhalten</b>'+esc(result.outcome)+'</div></div>';
+    '<div class="cp-outcome" style="--cp-fg:var('+m.colorVar+');--cp-bg:var('+m.bgVar+')"><span>'+m.icon+'</span><div><b>Systemverhalten</b>'+esc(result.outcome)+'</div></div>'+
+    actionsHtml;
+  if(kategorie==="verstoss"){
+    document.getElementById("btn-ablehnen").addEventListener("click", ()=>renderLetter("ablehnen"));
+    document.getElementById("btn-kuerzen").addEventListener("click", ()=>renderLetter("kuerzen"));
+  }
   panel.scrollIntoView({behavior:"smooth", block:"nearest"});
 }
 
 /* ========================= State & Wiring ========================= */
 let baseBeleg = null;
+let currentBeleg = null;
+let currentPP = null;
 
 function newBeleg(){
   baseBeleg = generateBeleg();
@@ -1078,10 +1255,40 @@ function newBeleg(){
 function selectCategory(cat){
   document.querySelectorAll(".cat-btn").forEach(b=>b.dataset.active = (b.dataset.cat===cat) ? "true" : "false");
   const result = classify(baseBeleg, cat);
+  currentBeleg = result.beleg;
+  currentPP = result.pp;
   renderDocument(result.beleg);
   document.getElementById("step-pill").textContent = "Schritt 2 · Einordnung";
   document.getElementById("stage-heading-text").textContent = CATEGORY_META[cat].label;
   renderClassification(cat, result);
+}
+
+function renderLetter(mode){
+  const panel = document.getElementById("letter-panel");
+  if(!panel || !currentBeleg || !currentPP) return;
+  const letter = mode==="ablehnen" ? buildAblehnungstext(currentBeleg,currentPP) : buildKuerzungstext(currentBeleg,currentPP);
+  panel.hidden = false;
+  panel.innerHTML =
+    '<div class="letter-head">'+
+      '<h3>'+(mode==="ablehnen"?"Ablehnungsschreiben":"Kürzungsschreiben")+'</h3>'+
+      '<p class="letter-sub">Automatisch erzeugter Kundentext auf Basis der geprüften Rechnungsinhalte — bereit für Druck/Versand in der Leistungsabrechnung.</p>'+
+    '</div>'+
+    '<div class="letter-cols">'+
+      '<div class="letter-col"><div class="letter-col-head"><span>Deutsch</span><button class="btn-copy" data-copy-target="letter-de" data-confirm="Kopiert" type="button">Kopieren</button></div><pre id="letter-de">'+esc(letter.betreffDe+"\n\n"+letter.de)+'</pre></div>'+
+      '<div class="letter-col"><div class="letter-col-head"><span>English</span><button class="btn-copy" data-copy-target="letter-en" data-confirm="Copied" type="button">Copy</button></div><pre id="letter-en">'+esc(letter.betreffEn+"\n\n"+letter.en)+'</pre></div>'+
+    '</div>';
+  panel.querySelectorAll(".btn-copy").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const target = document.getElementById(btn.dataset.copyTarget);
+      const text = target ? target.textContent : "";
+      const orig = btn.textContent;
+      const done = ()=>{ btn.textContent = btn.dataset.confirm; setTimeout(()=>{ btn.textContent = orig; }, 1200); };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done).catch(()=>{});
+      }
+    });
+  });
+  panel.scrollIntoView({behavior:"smooth", block:"nearest"});
 }
 
 document.getElementById("btn-new").addEventListener("click", newBeleg);
