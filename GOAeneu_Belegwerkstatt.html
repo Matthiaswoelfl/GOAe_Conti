@@ -466,28 +466,37 @@ function round2(n){ return Math.round(n*100)/100; }
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function dot(kind){ return '<i class="field-dot-'+kind+'"></i>'; } // p=Pflicht, g=ggf.Pflicht, f=freiwillig
 
-/* GOÄ-Ziffernkatalog: Nr., Bezeichnung (Titel der Leistungslegende), 1-facher Satz (illustrativ, gerundet an aktueller GOÄ orientiert) */
+/* GOÄ-Ziffernkatalog: echte Nummern, Titel der Leistungslegende und Gebührensatz aus dem GOÄneu-Gebührenverzeichnis (Anlage 1) */
 const Z = {
-  beratung:        {nr:"1",   bez:"Beratung – auch mittels Fernsprecher",              satz1:4.66},
-  einBeratung:      {nr:"3",   bez:"Eingehende Beratung",                               satz1:8.74,  dauer:"mind. 10 Minuten"},
-  symptUnters:      {nr:"5",   bez:"Symptombezogene Untersuchung",                       satz1:4.66},
-  ganzkoerper:      {nr:"7",   bez:"Ganzkörperstatus",                                   satz1:9.33},
-  blutentnahme:     {nr:"250", bez:"Blutentnahme",                                       satz1:2.33},
-  reflexpruefung:   {nr:"298", bez:"Prüfung von Reflexen und/oder Sensibilität",         satz1:3.50},
-  infiltration:     {nr:"255", bez:"Infiltrationsbehandlung, intra-/periartikulär",      satz1:5.83},
-  kryotherapie:     {nr:"200", bez:"Verödung/Kryotherapie kleiner Hautbezirk",           satz1:6.42},
-  exzision:         {nr:"2401",bez:"Exzision eines Hauttumors, einfach",                 satz1:22.85},
-  blutbild:         {nr:"3541",bez:"Kleines Blutbild, automatisiert",                    satz1:4.08},
-  sonoGelenk:       {nr:"418", bez:"Sonografische Untersuchung eines Gelenks",           satz1:15.61},
-  ekg:              {nr:"651", bez:"Elektrokardiografische Untersuchung",                satz1:14.57, dauer:"mind. 12 Ableitungen"},
-  echo:             {nr:"424", bez:"Echokardiografische Untersuchung",                   satz1:29.02},
-  langzeitEkg:      {nr:"652", bez:"Langzeit-EKG",                                       satz1:23.29, dauer:"mind. 18 Stunden"},
-  besuch:           {nr:"50",  bez:"Besuch",                                             satz1:19.90},
+  beratung:        {nr:"1",    bez:"Persönliche Beratung durch den Arzt",                                    satz1:14.11, dauer:"Dauer unter 10 Minuten"},
+  einBeratung:      {nr:"2",    bez:"Persönliche Beratung durch den Arzt",                                     satz1:21.21, dauer:"je vollendete 10 Minuten"},
+  organUntersuchung:{nr:"18",   bez:"Vollständige körperliche Untersuchung eines Organsystems",                satz1:25.44},
+  ganzkoerper:      {nr:"19",   bez:"Untersuchung zur Erhebung des Ganzkörperstatus",                          satz1:51.30},
+  blutentnahme:     {nr:"700",  bez:"Blutentnahme mittels Spritze, Kanüle oder Katheter aus der Vene",         satz1:5.29},
+  infiltration:     {nr:"729",  bez:"Medikamentöse Infiltrationsbehandlung im Bereich einer Körperregion",     satz1:18.21},
+  sonoOrgan:        {nr:"1200", bez:"Sonographische (Teil-)Untersuchung mit Bezug auf ein Organ",               satz1:21.00,
+    sonder:{quelle:"Kap. C VI. Sonographische Leistungen, Allgemeine Bestimmung Nr. 3", faktor:1.5,
+      bedingung:"Body-Mass-Index (BMI) ≥ 40 (bei Kindern/Jugendlichen > 97. geschlechtsspezifische Perzentile)",
+      pflichtangabe:"Körpermaße (Größe, Gewicht, BMI)"}},
+  dopplerEcho:      {nr:"1301", bez:"Doppler-Echokardiographie mittels PW- und/oder CW-Doppler",                satz1:56.05},
+  ekg:              {nr:"2901", bez:"Elektrokardiographische Untersuchung mit mindestens zwölf Ableitungen in Ruhe", satz1:29.00},
+  langzeitEkg:      {nr:"2905", bez:"Elektrokardiographische Untersuchung, Dauer 18 bis 36 Stunden (Langzeit-EKG)", satz1:50.00},
+  kryotherapie:     {nr:"4104", bez:"Kryotherapie der Haut",                                                    satz1:18.24},
+  dermatoskopie:    {nr:"4117", bez:"Dermatoskopie mittels Auflichtmikroskopie (bis 5 Hautläsionen)",           satz1:18.39},
+  neuroUntersuchung:{nr:"4300", bez:"Neurologische Untersuchung von mindestens drei Untersuchungsbereichen",    satz1:30.35},
+  exzisionKlein:    {nr:"5600", bez:"Exzision eines kleinen kutanen Prozesses",                                 satz1:43.46,
+    sonderGerinnung:{quelle:"Kap. L – Chirurgie, Allgemeine Bestimmung Nr. 8", faktor:2.0,
+      bedingung:"Gerinnungsstörung unter Vitamin-K-Antagonisten, anderen oralen Antikoagulanzien (DOAK) oder nicht medikamentös verursachte hämorrhagische Diathese, sofern die Blutstillung die Interventions-/Schnitt-Naht-Zeit nahezu verdoppelt und keine zeitliche Verschiebung möglich ist",
+      pflichtangabe:"medizinische Indikation und Grund für die nicht rechtzeitig mögliche Normalisierung der Blutstillung"},
+    sonderMehrfach:{quelle:"Kap. L – Chirurgie, Allgemeine Bestimmung Nr. 13", faktor:0.9,
+      bedingung:"ab der zweiten Hauptleistung an derselben Lokalisation mit demselben Zugang in zeitlichem Zusammenhang"}},
+  blutbild:         {nr:"11025",bez:"Blutbild, insgesamt",                                                      satz1:3.69},
 };
-/* Für Präfix „A“ (Analogleistung): tatsächlich erbrachte, nicht eigenständig gelistete Leistung je Fachrichtung */
+/* Für Präfix „A“ (Analogleistung): neuartige, im Gebührenverzeichnis noch nicht eigenständig gelistete Leistung je Fachrichtung */
 const ANALOG = {
-  telemedizin:      {basisNr:"3",  basisBez:"Eingehende Beratung",             satz1:8.74,  echt:"Video-Verlaufskontrolle (telemedizinisch)"},
-  videodermatoskop: {basisNr:"750",basisBez:"Mikroskopische Untersuchung",     satz1:12.50, echt:"Digitale Videodermatoskopie mehrerer Läsionen"},
+  sturzrisiko:      {basisNr:"2",    basisBez:"Persönliche Beratung durch den Arzt (je vollendete 10 Minuten)", satz1:21.21, echt:"KI-gestützte Sturzrisikoanalyse mittels App-basierter Ganganalyse"},
+  hautmapping:      {basisNr:"4118", basisBez:"Dermatoskopie mittels Auflichtmikroskopie (bei mehr als 5 Hautläsionen)", satz1:24.99, echt:"KI-gestützte Ganzkörper-Kartierung und Verlaufsvergleich von Pigmentmalen (3D-Totalkörperfotografie)"},
+  rhythmusKI:       {basisNr:"2901", basisBez:"Elektrokardiographische Untersuchung mit mindestens zwölf Ableitungen in Ruhe", satz1:29.00, echt:"KI-gestützte Rhythmusanalyse von Smartwatch-EKG-Rohdaten (ärztlicher Over-read)"},
 };
 
 const PRAEFIX_INFO = {
@@ -539,35 +548,47 @@ function reiseBetrag(km, abwesenheitStd){
   const abwesenheit = abwesenheitStd>8 ? 200 : 100;
   return round2(kmBetrag+abwesenheit);
 }
+/* Körpermaße für die BMI-Sonderregel: band 'grenzwert' trifft den Schwellenwert exakt (BMI 40,0) */
+function generateKoerpermasse(band){
+  const groesseCm = randInt(155,190);
+  const groesseM = groesseCm/100;
+  let bmiZiel;
+  if(band==="grenzwert") bmiZiel = 40.0;
+  else if(band==="ueber") bmiZiel = randInt(42,58);
+  else bmiZiel = randInt(21,33);
+  const gewichtKg = Math.round(bmiZiel*groesseM*groesseM*2)/2;
+  const bmi = round2(gewichtKg/(groesseM*groesseM));
+  return {groesseCm, gewichtKg, bmi};
+}
 
 const FACHRICHTUNGEN = [
   {
     name:"Allgemeinmedizin", suffix:"Hausarztpraxis",
     diagnosen:["Akute Bronchitis","Hypertensive Herzkrankheit","Typ-2-Diabetes mellitus, entgleist"],
     icd:{"Akute Bronchitis":"J20.9","Hypertensive Herzkrankheit":"I11.9","Typ-2-Diabetes mellitus, entgleist":"E11.9"},
-    ziffern:[Z.beratung,Z.einBeratung,Z.symptUnters,Z.ganzkoerper,Z.blutentnahme,Z.blutbild],
-    analog: ANALOG.telemedizin,
+    ziffern:[Z.beratung,Z.einBeratung,Z.organUntersuchung,Z.ganzkoerper,Z.blutentnahme,Z.blutbild],
+    analog: ANALOG.sturzrisiko,
   },
   {
     name:"Orthopädie", suffix:"Praxis für Orthopädie",
     diagnosen:["Lumbalgie","Gonarthrose rechts","Rotatorenmanschettenruptur links"],
     icd:{"Lumbalgie":"M54.5","Gonarthrose rechts":"M17.1","Rotatorenmanschettenruptur links":"M75.1"},
-    ziffern:[Z.beratung,Z.symptUnters,Z.reflexpruefung,Z.sonoGelenk,Z.infiltration,Z.kryotherapie],
-    analog: ANALOG.telemedizin,
+    ziffern:[Z.beratung,Z.organUntersuchung,Z.neuroUntersuchung,Z.sonoOrgan,Z.infiltration,Z.blutentnahme],
+    analog: ANALOG.sturzrisiko,
   },
   {
     name:"Kardiologie", suffix:"Kardiologische Gemeinschaftspraxis",
     diagnosen:["Vorhofflimmern, persistierend","Koronare Herzkrankheit, Ein-Gefäß-Erkrankung","Belastungsdyspnoe, unklarer Genese"],
     icd:{"Vorhofflimmern, persistierend":"I48.1","Koronare Herzkrankheit, Ein-Gefäß-Erkrankung":"I25.11","Belastungsdyspnoe, unklarer Genese":"R06.0"},
-    ziffern:[Z.einBeratung,Z.ganzkoerper,Z.ekg,Z.echo,Z.langzeitEkg,Z.blutentnahme],
-    analog: ANALOG.telemedizin,
+    ziffern:[Z.einBeratung,Z.ganzkoerper,Z.ekg,Z.dopplerEcho,Z.langzeitEkg,Z.blutentnahme],
+    analog: ANALOG.rhythmusKI,
   },
   {
     name:"Dermatologie", suffix:"Hautarztpraxis",
     diagnosen:["Atopisches Ekzem","Aktinische Keratose, multipel","Verdacht auf malignes Melanom"],
     icd:{"Atopisches Ekzem":"L20.9","Aktinische Keratose, multipel":"L57.0","Verdacht auf malignes Melanom":"D48.5"},
-    ziffern:[Z.beratung,Z.symptUnters,Z.kryotherapie,Z.exzision,Z.blutentnahme],
-    analog: ANALOG.videodermatoskop,
+    ziffern:[Z.beratung,Z.dermatoskopie,Z.kryotherapie,Z.exzisionKlein,Z.blutentnahme],
+    analog: ANALOG.hautmapping,
   },
 ];
 
@@ -756,12 +777,12 @@ function applyKorrekt(b){
 
 function applyGrenzfall(b){
   const pp = [];
-  const subtype = pick(["hv_wahlleistung","analog_kapitel_m","wegegeld_25km","nachtbesuch_grenze","minderung_rolle","verdachtsdiagnose"]);
+  const subtype = pick(["hv_wahlleistung","analog_kapitel_m","wegegeld_25km","nachtbesuch_grenze","minderung_rolle","verdachtsdiagnose","bmi_grenzwert_prosa","gerinnung_grenzwertig"]);
   if(subtype==="hv_wahlleistung"){
     const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
     p.faktorGrund = ["HV"];
     p.faktor = 2.1;
-    p.betrag = round2((Z[Object.keys(Z).find(k=>Z[k].nr===p.goaeNr)]||{satz1:p.betrag}).satz1 * p.faktor);
+    p.betrag = round2(p.satz1 * p.faktor);
     p.begruendung = "Honorarvereinbarung vom "+fmtDate(addDays(b.leistungsdatum,-2))+": Nr. "+p.goaeNr+" „"+p.titel+"“, Faktor 2,1, vereinbarter Betrag "+euro(p.betrag)+", Hinweis auf ggf. nicht vollständige Kostenerstattung erteilt.";
     addFlag(p,"boundary","§2 Abs. 1 S. 3 GOÄneu","Honorarvereinbarung bei wahlärztlicher Leistung — zulässig nur, wenn die Leistung vom Wahlarzt höchstpersönlich erbracht wurde.");
     pp.push({status:"boundary", rule:"§2 Abs. 1 S. 3 GOÄneu", title:"Honorarvereinbarung bei (vermutet) wahlärztlicher Leistung", detail:"Bei vollstationären u.ä. wahlärztlichen Leistungen ist eine Honorarvereinbarung „nur für vom Wahlarzt höchstpersönlich erbrachte Leistungen zulässig“. Die Vereinbarung selbst enthält alle Pflichtangaben nach §2 Abs.2 — ob die persönliche Erbringung durch den Wahlarzt vorlag, ist dem Beleg allein aber nicht anzusehen.",
@@ -790,6 +811,23 @@ function applyGrenzfall(b){
     addFlag(b.positionen[0],"boundary","§6a Abs. 1 GOÄneu","Minderungssatz 15 % nur korrekt, wenn tatsächlich ein Beleg- bzw. niedergelassener Arzt und kein Krankenhausarzt abrechnet.");
     pp.push({status:"boundary", rule:"§6a Abs. 1 S. 1–2 GOÄneu", title:"Minderungssatz hängt an der Arztrolle", detail:"§6a GOÄneu sieht 25 % Minderung bei Krankenhausärzten vor, aber nur 15 % „für Leistungen … von Belegärzten oder niedergelassenen anderen Ärzten“. Der Beleg weist 15 % aus — plausibel nur, wenn die Arztrolle im Einzelfall eindeutig als Beleg-/niedergelassener Arzt und nicht als angestellter Krankenhausarzt zu werten ist.",
       kundentext:kt("Von Ihrer Rechnung wurde ein Abschlag von 15 % vorgenommen, wie er für Belegärzte bzw. niedergelassene Ärzte gilt. Wir prüfen, ob diese Einordnung zutrifft.","A 15% reduction was applied to your invoice, as required for attending or private-practice physicians. We are checking whether this classification is correct.")});
+  } else if(subtype==="bmi_grenzwert_prosa"){
+    const s = Z.sonoOrgan.sonder;
+    const km = generateKoerpermasse("grenzwert");
+    const pos = makeVergPos(Z.sonoOrgan, {faktor:s.faktor,
+      begruendung:"Körpergröße "+(km.groesseCm/100).toFixed(2).replace(".",",")+"m, Gewicht ca. "+km.gewichtKg+"kg."});
+    b.positionen.push(pos);
+    addFlag(pos,"boundary",s.quelle,"Größe und Gewicht sind angegeben, der BMI-Wert selbst ("+km.bmi.toFixed(1).replace(".",",")+") wird aber nicht explizit genannt und liegt unmittelbar am Schwellenwert.");
+    pp.push({status:"boundary", rule:s.quelle, title:"BMI-Zuschlag: Grenzwert nur aus Körpermaßen berechenbar", detail:"Für Nr. "+pos.goaeNr+" wird der "+s.faktor.toFixed(1).replace(".",",")+"-fache Satz angesetzt. Die Begründung nennt Größe und Gewicht in Prosaform, aus denen sich rechnerisch ein BMI von "+km.bmi.toFixed(1).replace(".",",")+" ergibt — unmittelbar am Schwellenwert „BMI ≥ 40“. Die Pflichtangabe verlangt aber ausdrücklich auch den BMI-Wert selbst, nicht nur die Rohmaße, und bei einem derart knappen Wert entscheidet die Rundung, ob die Schwelle erfüllt ist oder nicht.",
+      kundentext:kt("Für diese Untersuchung wurde ein erhöhter Satz berechnet, der ab einem bestimmten Körpergewicht im Verhältnis zur Körpergröße zulässig ist. Wir prüfen, ob dieser Wert anhand der angegebenen Maße tatsächlich erreicht wird.","An increased fee was charged for this examination, which is permitted from a certain body weight relative to height. We are checking whether this threshold is actually met based on the measurements given.")});
+  } else if(subtype==="gerinnung_grenzwertig"){
+    const s = Z.exzisionKlein.sonderGerinnung;
+    const pos = makeVergPos(Z.exzisionKlein, {faktor:s.faktor,
+      begruendung:"Patient unter Apixaban (DOAK), Blutstillung deutlich erschwert; Eingriff dringlich, keine Verschiebung möglich."});
+    b.positionen.push(pos);
+    addFlag(pos,"boundary",s.quelle,"Gerinnungshemmer und Dringlichkeit sind genannt, ob die Interventionszeit dadurch „nahezu verdoppelt“ war, bleibt offen.");
+    pp.push({status:"boundary", rule:s.quelle, title:"Gerinnungsstörungs-Zuschlag knapp begründet", detail:"Für Nr. "+pos.goaeNr+" wird der "+s.faktor.toFixed(1).replace(".",",")+"-fache Satz wegen einer Gerinnungsstörung unter DOAK-Therapie angesetzt. Wirkstoff und Dringlichkeit sind genannt — die Bestimmung verlangt aber zusätzlich, dass „die Interventions- bzw. Schnitt-Naht-Zeit nahezu verdoppelt“ war; ob das hier ausreichend belegt ist, ist auslegungsbedürftig.",
+      kundentext:kt("Für diesen Eingriff wurde ein erhöhter Satz berechnet, weil eine die Blutgerinnung beeinflussende Medikation vorlag. Wir prüfen, ob der dadurch entstandene Mehraufwand ausreichend belegt ist.","An increased fee was charged for this procedure because of medication affecting blood clotting. We are checking whether the resulting extra effort is sufficiently documented.")});
   } else {
     b.diagnose.kennzeichen = "VA";
     addFlag(b.positionen[0],"boundary","§12 Abs. 2 Nr. 1 GOÄneu","Verdachtsdiagnose (VA) kurz vor der eigentlichen Befundabklärung — laut Gesetz nur bis dahin zulässig.");
@@ -801,7 +839,7 @@ function applyGrenzfall(b){
 
 function applyVerstoss(b){
   const pp = [];
-  const pool = ["titel_fehlt","analog_ohne_praefix","diagnose_fehlt_unbegruendet","ab_ohne_konkretisierung","rechenfehler","sachkosten_unzulaessig","hv_verbotenes_kapitel"];
+  const pool = ["titel_fehlt","analog_ohne_praefix","diagnose_fehlt_unbegruendet","ab_ohne_konkretisierung","rechenfehler","sachkosten_unzulaessig","hv_verbotenes_kapitel","bmi_unter_schwelle","bmi_pflichtangabe_fehlt","gerinnung_ohne_begruendung","mehrfacheingriff_kein_abschlag"];
   const subtypes = pickN(pool, randInt(1,2));
   subtypes.forEach(subtype=>{
     if(subtype==="titel_fehlt"){
@@ -828,7 +866,7 @@ function applyVerstoss(b){
         korrektur:{typ:"gesamt"}});
     } else if(subtype==="ab_ohne_konkretisierung"){
       const p = pick(b.positionen.filter(x=>x.kind==="leistung"));
-      p.faktorGrund = ["AB"]; p.faktor = 1.5; p.betrag = round2((Z[Object.keys(Z).find(k=>Z[k].nr===p.goaeNr)]||{satz1:p.betrag}).satz1*1.5);
+      p.faktorGrund = ["AB"]; p.faktor = 1.5; p.betrag = round2(p.satz1*1.5);
       p.begruendung = "Erhöhter Aufwand.";
       addFlag(p,"violation","Kap. 3.9 Faktor-Grund „AB“","Faktor-Grund „AB“ gesetzt, aber die konkrete Allgemeine Bestimmung wird in der Begründung nicht benannt.");
       pp.push({status:"violation", rule:"Kap. 3.9 Faktor-Grund „AB“", title:"Abrechnungsbestimmung nicht konkretisiert", detail:"Bei Faktor-Grund „AB“ verlangt das Rechnungsformular ausdrücklich, dass „die konkrete Allgemeine Bestimmung oder Abrechnungsbestimmung … in der Begründung anzugeben“ ist. Hier steht nur „Erhöhter Aufwand.“ — das erfüllt die Vorgabe nicht.",
@@ -856,6 +894,41 @@ function applyVerstoss(b){
       pp.push({status:"violation", rule:"§2 Abs. 1 S. 2 GOÄneu", title:"Honorarvereinbarung in einem gesetzlich ausgeschlossenen Kapitel", detail:"§2 Abs.1 S.2 GOÄneu schließt eine abweichende Vereinbarung „für Leistungen nach den Kapiteln E, M, N und O“ ausdrücklich aus. Für Nr. "+p.goaeNr+" ist dennoch eine Honorarvereinbarung mit Faktor 2,5 hinterlegt — unzulässig.",
         kundentext:kt("Für diese Leistung wurde ein individuell erhöhtes Honorar vereinbart, obwohl das für diese Art von Leistung nicht zulässig ist. Wir erstatten daher nur den regulären Gebührensatz.","An individually increased fee was agreed for this service, although this is not permitted for this type of service. We therefore reimburse only the standard fee."),
         korrektur:{typ:"faktor", posId:p.id}});
+    } else if(subtype==="bmi_unter_schwelle"){
+      const s = Z.sonoOrgan.sonder;
+      const km = generateKoerpermasse("unter");
+      const pos = makeVergPos(Z.sonoOrgan, {faktor:s.faktor,
+        begruendung:"Körpergröße "+(km.groesseCm/100).toFixed(2).replace(".",",")+"m, Gewicht ca. "+km.gewichtKg+"kg (BMI "+km.bmi.toFixed(1).replace(".",",")+")."});
+      b.positionen.push(pos);
+      addFlag(pos,"violation",s.quelle,"Angegebener BMI liegt deutlich unter dem für den Zuschlag erforderlichen Schwellenwert von 40.");
+      pp.push({status:"violation", rule:s.quelle, title:"BMI-Zuschlag trotz nicht erfüllter Voraussetzung", detail:"Für Nr. "+pos.goaeNr+" wird der "+s.faktor.toFixed(1).replace(".",",")+"-fache Satz berechnet. Aus den angegebenen Körpermaßen errechnet sich ein BMI von "+km.bmi.toFixed(1).replace(".",",")+" — deutlich unter dem in der Bestimmung geforderten Schwellenwert „BMI ≥ 40“. Die Voraussetzung für den Zuschlag liegt damit erkennbar nicht vor.",
+        kundentext:kt("Für diese Untersuchung wurde ein erhöhter Satz berechnet, der erst ab einem bestimmten Körpergewicht im Verhältnis zur Größe zulässig ist. Die angegebenen Maße erreichen diesen Wert nicht, daher können wir nur den regulären Satz erstatten.","An increased fee was charged for this examination, which only applies from a certain weight relative to height. The stated measurements do not reach that threshold, so we can only reimburse the standard fee."),
+        korrektur:{typ:"faktor", posId:pos.id}});
+    } else if(subtype==="bmi_pflichtangabe_fehlt"){
+      const s = Z.sonoOrgan.sonder;
+      const pos = makeVergPos(Z.sonoOrgan, {faktor:s.faktor, begruendung:"Erhöhter Aufwand aufgrund der Körperkonstitution."});
+      b.positionen.push(pos);
+      addFlag(pos,"violation",s.quelle,"Körpermaße (Größe, Gewicht, BMI) fehlen vollständig — Pflichtangabe für diesen Zuschlag.");
+      pp.push({status:"violation", rule:s.quelle, title:"BMI-Zuschlag ohne Angabe der Körpermaße", detail:"Für Nr. "+pos.goaeNr+" wird der "+s.faktor.toFixed(1).replace(".",",")+"-fache Satz berechnet, die Begründung nennt aber weder Größe noch Gewicht noch BMI. Die Bestimmung verlangt ausdrücklich: „Die Körpermaße (Größe, Gewicht, BMI) müssen in der Rechnung angegeben werden.“",
+        kundentext:kt("Für diese Untersuchung wurde ein erhöhter Satz berechnet, für den laut Vorgabe Körpergröße, Gewicht und BMI auf der Rechnung stehen müssen. Diese Angaben fehlen, daher können wir zunächst nur den regulären Satz erstatten.","An increased fee was charged for this examination, which requires height, weight and BMI to be stated on the invoice. This information is missing, so we can initially only reimburse the standard fee."),
+        korrektur:{typ:"faktor", posId:pos.id}});
+    } else if(subtype==="gerinnung_ohne_begruendung"){
+      const s = Z.exzisionKlein.sonderGerinnung;
+      const pos = makeVergPos(Z.exzisionKlein, {faktor:s.faktor, begruendung:"Erhöhter Aufwand."});
+      b.positionen.push(pos);
+      addFlag(pos,"violation",s.quelle,"Weder Wirkstoff/Gerinnungsstörung noch der Grund für die nicht mögliche Normalisierung sind genannt.");
+      pp.push({status:"violation", rule:s.quelle, title:"Gerinnungsstörungs-Zuschlag ohne Pflichtangaben", detail:"Für Nr. "+pos.goaeNr+" wird der "+s.faktor.toFixed(1).replace(".",",")+"-fache Satz berechnet, die Begründung lautet nur „Erhöhter Aufwand.“ Die Bestimmung verlangt ausdrücklich, dass „die medizinische Indikation und der Grund für die nicht rechtzeitig mögliche Normalisierung der Blutstillung … in der Rechnung angegeben werden“ müssen.",
+        kundentext:kt("Für diesen Eingriff wurde ein erhöhter Satz berechnet, der eine genaue Begründung zur Gerinnungssituation voraussetzt. Diese Begründung fehlt, daher können wir zunächst nur den regulären Satz erstatten.","An increased fee was charged for this procedure, which requires a specific justification regarding the clotting situation. This justification is missing, so we can initially only reimburse the standard fee."),
+        korrektur:{typ:"faktor", posId:pos.id}});
+    } else if(subtype==="mehrfacheingriff_kein_abschlag"){
+      const s = Z.exzisionKlein.sonderMehrfach;
+      const pos1 = makeVergPos(Z.exzisionKlein, {begruendung:"Erste Exzision, linker Unterarm."});
+      const pos2 = makeVergPos(Z.exzisionKlein, {begruendung:"Zweite Exzision, gleiche Lokalisation und Zugang, gleiche Sitzung."});
+      b.positionen.push(pos1,pos2);
+      addFlag(pos2,"violation",s.quelle,"Zweite Hauptleistung an derselben Lokalisation ohne den vorgeschriebenen Abschlag auf "+s.faktor.toFixed(1).replace(".",",")+"-fach abgerechnet.");
+      pp.push({status:"violation", rule:s.quelle, title:"Mehrfacheingriff-Abschlag nicht angewendet", detail:"Beide Positionen zu Nr. "+pos2.goaeNr+" betreffen dieselbe Lokalisation mit demselben Zugang in derselben Sitzung. Die Bestimmung schreibt vor: „Sofern an derselben Lokalisation mit demselben Zugang mehrere Eingriffe in zeitlichem Zusammenhang durchgeführt werden, ist ab der zweiten Hauptleistung nur die "+s.faktor.toFixed(1).replace(".",",")+"-fache Gebühr zu berechnen.“ Hier ist die zweite Position aber zum vollen Satz abgerechnet.",
+        kundentext:kt("Für den zweiten Eingriff an derselben Stelle in derselben Sitzung gilt ein reduzierter Satz. Dieser wurde nicht angewendet — wir korrigieren den Betrag entsprechend.","A reduced fee applies to the second procedure at the same site in the same session. This reduction was not applied — we are correcting the amount accordingly."),
+        korrektur:{typ:"mehrfach", posId:pos2.id, faktor:s.faktor}});
     }
   });
   return {pp, outcome:"Erwartetes Systemverhalten: Beleg wird zurückgewiesen bzw. es wird eine Nachforderung an die Praxis ausgelöst."};
@@ -969,7 +1042,8 @@ function berechneKuerzung(beleg, pp){
     if(k.typ==="rechenfehler"){ zeilen.push({titel:null, alt:null, neu:null, grundDe:item.kundentext.de, grundEn:item.kundentext.en}); return; }
     const pos = positions.find(x=>x.id===k.posId);
     if(!pos) return;
-    const neu = k.typ==="streichen" ? 0 : (pos.satz1!==undefined ? pos.satz1 : pos.betrag);
+    const satz1 = pos.satz1!==undefined ? pos.satz1 : pos.betrag;
+    const neu = k.typ==="streichen" ? 0 : k.typ==="mehrfach" ? round2(satz1*k.faktor) : satz1;
     zeilen.push({titel:pos.titel||("GOÄ-Nr. "+pos.goaeNr), alt:pos.betrag, neu, grundDe:item.kundentext.de, grundEn:item.kundentext.en});
     pos.betrag = neu;
   });
