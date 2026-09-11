@@ -527,6 +527,8 @@ const Z = {
     sonderMehrfach:{quelle:"Kap. L – Chirurgie, Allgemeine Bestimmung Nr. 13", faktor:0.9,
       bedingung:"ab der zweiten Hauptleistung an derselben Lokalisation mit demselben Zugang in zeitlichem Zusammenhang"}},
   blutbild:         {nr:"11025",bez:"Blutbild, insgesamt",                                                      satz1:3.69},
+  frueherkVorsorge: {nr:"116",  bez:"Erwachsenen-Vorsorgeuntersuchung zur Früherkennung von Herz-, Kreislauf-, Nieren-, Stoffwechsel- und rheumatischen Erkrankungen", satz1:94.53},
+  frueherkHaut:     {nr:"117",  bez:"Untersuchung der Haut und der sichtbaren Schleimhäute zur Früherkennung von Krebserkrankungen", satz1:37.94},
 };
 /* Für Präfix „A“ (Analogleistung): neuartige, im Gebührenverzeichnis noch nicht eigenständig gelistete Leistung je Fachrichtung */
 const ANALOG = {
@@ -604,6 +606,7 @@ const FACHRICHTUNGEN = [
     icd:{"Akute Bronchitis":"J20.9","Hypertensive Herzkrankheit":"I11.9","Typ-2-Diabetes mellitus, entgleist":"E11.9"},
     ziffern:[Z.beratung,Z.einBeratung,Z.organUntersuchung,Z.ganzkoerper,Z.blutentnahme,Z.blutbild],
     analog: ANALOG.sturzrisiko,
+    frueherkennung: Z.frueherkVorsorge,
   },
   {
     name:"Orthopädie", suffix:"Praxis für Orthopädie",
@@ -611,6 +614,7 @@ const FACHRICHTUNGEN = [
     icd:{"Lumbalgie":"M54.5","Gonarthrose rechts":"M17.1","Rotatorenmanschettenruptur links":"M75.1"},
     ziffern:[Z.beratung,Z.organUntersuchung,Z.neuroUntersuchung,Z.sonoOrgan,Z.infiltration,Z.blutentnahme],
     analog: ANALOG.sturzrisiko,
+    frueherkennung: null,
   },
   {
     name:"Kardiologie", suffix:"Kardiologische Gemeinschaftspraxis",
@@ -618,6 +622,7 @@ const FACHRICHTUNGEN = [
     icd:{"Vorhofflimmern, persistierend":"I48.1","Koronare Herzkrankheit, Ein-Gefäß-Erkrankung":"I25.11","Belastungsdyspnoe, unklarer Genese":"R06.0"},
     ziffern:[Z.einBeratung,Z.ganzkoerper,Z.ekg,Z.dopplerEcho,Z.langzeitEkg,Z.blutentnahme],
     analog: ANALOG.rhythmusKI,
+    frueherkennung: Z.frueherkVorsorge,
   },
   {
     name:"Dermatologie", suffix:"Hautarztpraxis",
@@ -625,8 +630,18 @@ const FACHRICHTUNGEN = [
     icd:{"Atopisches Ekzem":"L20.9","Aktinische Keratose, multipel":"L57.0","Verdacht auf malignes Melanom":"D48.5"},
     ziffern:[Z.beratung,Z.dermatoskopie,Z.kryotherapie,Z.exzisionKlein,Z.blutentnahme],
     analog: ANALOG.hautmapping,
+    frueherkennung: Z.frueherkHaut,
   },
 ];
+/* Faktor-Grund "HV" im Basis-Generator nur für Leistungen aus Kap. B (Grundleistungen) — §2 Abs.1 S.2 GOÄneu schließt Kap. E/M/N/O aus */
+const HV_FAEHIGE_ZIFFERN = [Z.beratung.nr, Z.einBeratung.nr, Z.organUntersuchung.nr, Z.ganzkoerper.nr];
+/* Illustrative Gebührensatz-Reduktion für Basis-/Standard-/Notlagentarif-Versicherte (§12 Abs.2 Nr.6 GOÄneu i.V.m. §75 SGB V) —
+   die tatsächlichen Prozentsätze ergeben sich aus §75 Abs.3a/3b SGB V und sind hier nicht hinterlegt; Faktoren dienen nur der Illustration. */
+const TARIF_INFO = {
+  BT:{label:"Basistarif", faktor:0.80},
+  ST:{label:"Standardtarif", faktor:0.90},
+  NT:{label:"Notlagentarif", faktor:0.75},
+};
 
 /* ========================= Beleg-Generierung ========================= */
 function generatePerson(){
@@ -710,7 +725,7 @@ function makeWegegeldPos(opts){
 }
 function makeAnalogPos(a, opts){
   opts = opts||{};
-  const faktor = opts.faktor!==undefined ? opts.faktor : 2.3;
+  const faktor = opts.faktor!==undefined ? opts.faktor : 1.0;
   const betrag = round2(a.satz1*faktor);
   return {
     id: Math.random().toString(36).slice(2,9), kind:"analog",
@@ -757,12 +772,59 @@ function generateBeleg(){
 
   if(Math.random()<0.35){ positionen.push(makeSachkostenPos({unzulaessig:false})); }
 
+  /* Präfix F: Früherkennungsleistung nach gesetzlich eingeführtem Programm */
+  if(fach.frueherkennung && Math.random()<0.25){
+    positionen.push(makeVergPos(fach.frueherkennung, {praefixe:["F"]}));
+  }
+  /* Präfix V: Verlangensleistung — über das medizinisch notwendige Maß hinaus, auf ausdrücklichen Wunsch */
+  if(Math.random()<0.18){
+    const bereitsGewaehlt = new Set(positionen.filter(p=>p.kind==="leistung").map(p=>p.goaeNr));
+    const kandidaten = fach.ziffern.filter(z=>!bereitsGewaehlt.has(z.nr));
+    const basis = pick(kandidaten.length ? kandidaten : fach.ziffern);
+    positionen.push(makeVergPos(basis, {praefixe:["V"],
+      begruendung:"Auf ausdrücklichen Wunsch der Patientin/des Patienten, über das medizinisch notwendige Maß hinaus erbracht; vorherige Information in Textform über die voraussichtliche Honorarhöhe erteilt."}));
+  }
+  /* Präfix A: korrekt gekennzeichnete Analogleistung */
+  if(Math.random()<0.18){
+    positionen.push(makeAnalogPos(fach.analog));
+  }
+  /* Präfix W/R: Hausbesuch */
+  if(Math.random()<0.18){
+    const km = randInt(1,32);
+    if(km<=25) positionen.push(makeWegegeldPos({praefix:"W", km, nacht:Math.random()<0.2}));
+    else positionen.push(makeWegegeldPos({praefix:"R", km, abwesenheitStd:randInt(1,4)}));
+  }
+
+  /* Faktor-Grund im Alltag: entweder individuelle Honorarvereinbarung (HV, nur Kap. B) oder Tarif-Minderung (BT/ST/NT) für alle Leistungen */
+  let tarif = null;
+  if(Math.random()<0.12){
+    const hvKandidaten = positionen.filter(p=>p.kind==="leistung" && HV_FAEHIGE_ZIFFERN.includes(p.goaeNr));
+    if(hvKandidaten.length){
+      const p = pick(hvKandidaten);
+      p.faktorGrund = ["HV"];
+      p.faktor = pick([1.5,1.8,2.0,2.3]);
+      p.betrag = round2(p.satz1*p.faktor);
+      p.begruendung = "Honorarvereinbarung vom "+fmtDate(addDays(leistungsdatum,-3))+": Nr. "+p.goaeNr+" „"+p.titel+"“, Faktor "+p.faktor.toFixed(1).replace(".",",")+", vereinbarter Betrag "+euro(p.betrag)+", Hinweis auf ggf. nicht vollständige Kostenerstattung erteilt.";
+    }
+  } else if(Math.random()<0.12){
+    tarif = pick(["BT","ST","NT"]);
+    const info = TARIF_INFO[tarif];
+    positionen.forEach(p=>{
+      if(p.kind==="leistung"){
+        p.faktorGrund = [tarif];
+        p.faktor = info.faktor;
+        p.betrag = round2(p.satz1*p.faktor);
+        p.begruendung = info.label+"-Versicherte(r): angewandter Gebührensatz nach § 75 Abs. 3a/3b SGB V (Satz hier illustrativ, nicht die exakte Prozentangabe des SGB V).";
+      }
+    });
+  }
+
   const rechnungsnummer = "RG-"+heute.getFullYear()+"-"+randInt(10000,99999);
   const abrechnungsstelle = Math.random()<0.4;
 
   return {
     id: rechnungsnummer,
-    fach, arzt, patient,
+    fach, arzt, patient, tarif,
     empfaenger: null, // null = identisch mit Patient
     verantwortlicheAerzte: [{lfdNr:1, anrede:arzt.anrede, titel:arzt.titel, name:arzt.vorname+" "+arzt.nachname, lanr:arzt.lanr}],
     diagnose: { text: diagnoseName, icd: fach.icd[diagnoseName], kennzeichen:null, entfaellt:false, entfaelltGrund:null },
@@ -821,14 +883,45 @@ const CATEGORY_META = {
 function addFlag(p, type, rule, text){ p.flags.push({type, rule, text}); }
 function kt(de,en){ return {de,en}; }
 
+function praefixKundentext(code){
+  const m = {
+    F: kt("Diese Untersuchung ist eine gesetzlich vorgesehene Vorsorgeleistung und als solche gekennzeichnet.","This examination is a legally provided preventive-care service and is labelled as such."),
+    V: kt("Diese Leistung wurde auf Ihren ausdrücklichen Wunsch über das medizinisch Notwendige hinaus erbracht und ist entsprechend gekennzeichnet.","This service was provided at your explicit request beyond what was medically necessary, and is labelled accordingly."),
+    A: kt("Diese Leistung ist neu und noch nicht mit einer eigenen Gebührennummer versehen; sie wurde korrekt als vergleichbare Leistung gekennzeichnet.","This service is new and not yet assigned its own fee number; it has been correctly labelled as a comparable service."),
+    W: kt("Für den Hausbesuch wurde eine Wegepauschale berechnet und entsprechend gekennzeichnet.","A travel allowance was charged for the house call and labelled accordingly."),
+    R: kt("Für den weiter entfernten Hausbesuch wurde eine Reiseentschädigung statt Wegegeld berechnet und entsprechend gekennzeichnet.","For the more distant house call, a travel allowance was charged instead of the standard travel fee, and labelled accordingly."),
+  };
+  return m[code];
+}
+
 function applyKorrekt(b){
   const pp = [];
   pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 1 GOÄneu", title:"Diagnose vollständig angegeben", detail:"„"+b.diagnose.text+"“ (ICD-10 "+b.diagnose.icd+") ist als behandlungsrelevante Diagnose benannt.",
     kundentext:kt("Die Diagnose wurde vollständig angegeben und bei der Prüfung berücksichtigt.","The diagnosis was provided in full and has been taken into account in our review.")});
-  pp.push({status:"ok", rule:"§5 GOÄneu / §12 Abs. 2 Nr. 3–4", title:"Fester Gebührensatz ohne Faktor-Abweichung", detail:"Jede Position trägt den vollen Eurobetrag aus dem Gebührenverzeichnis zum Faktor 1,0 — GOÄneu kennt keinen Steigerungsfaktor mehr; ein Faktor-Grund (HV/AB/BT/ST/NT) ist hier nicht einschlägig und folgerichtig auch nicht gesetzt.",
-    kundentext:kt("Für diese Leistungen wurde der reguläre Gebührensatz ohne Zuschlag berechnet.","These services were billed at the standard fee, with no surcharge.")});
+
+  const faktorPos = b.positionen.find(p=>p.faktorGrund && p.faktorGrund.length);
+  if(faktorPos){
+    const grund = faktorPos.faktorGrund[0];
+    const info = FAKTORGRUND_INFO[grund];
+    pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 4/6 GOÄneu · Faktor-Grund „"+grund+"“", title:"Abweichender Faktor korrekt begründet und gekennzeichnet", detail:"Nr. "+faktorPos.goaeNr+" trägt den Faktor-Grund „"+grund+"“ ("+info.label+") mit Faktor "+faktorPos.faktor.toFixed(2).replace(".",",")+". GOÄneu kennt zwar keinen generellen Steigerungsfaktor mehr, wohl aber diese gezielt geregelten Abweichungsgründe — die Begründung liegt hier vollständig vor.",
+      kundentext:kt("Für diese Leistung gilt ein individuell begründeter, abweichender Satz. Die Begründung liegt vollständig vor.","An individually justified, different rate applies to this service. The justification is provided in full.")});
+  } else {
+    pp.push({status:"ok", rule:"§5 GOÄneu", title:"Fester Gebührensatz ohne Faktor-Abweichung", detail:"Jede Position trägt den vollen Eurobetrag aus dem Gebührenverzeichnis zum Faktor 1,0 — GOÄneu kennt keinen generellen Steigerungsfaktor mehr; ein besonderer Faktor-Grund (HV/AB/BT/ST/NT) ist hier nicht einschlägig.",
+      kundentext:kt("Für diese Leistungen wurde der reguläre Gebührensatz ohne Zuschlag berechnet.","These services were billed at the standard fee, with no surcharge.")});
+  }
+
   pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 3 GOÄneu", title:"Nummer, Anzahl und Titel der Leistungslegende vollständig", detail:"Für jede Position sind GOÄ-Nummer, Anzahl und ein patientenverständlicher Titel ausgewiesen.",
     kundentext:kt("Alle Pflichtangaben zu den abgerechneten Leistungen liegen vollständig vor.","All mandatory details for the billed services are complete.")});
+
+  const vorhandenePraefixe = new Set();
+  b.positionen.forEach(p=>(p.praefixe||[]).forEach(code=>vorhandenePraefixe.add(code)));
+  ["F","V","A","W","R","E"].forEach(code=>{
+    if(!vorhandenePraefixe.has(code)) return;
+    const info = PRAEFIX_INFO[code];
+    pp.push({status:"ok", rule:"§12 Abs. 4 GOÄneu · Präfix „"+code+"“", title:info.label+" korrekt gekennzeichnet", detail:"Mindestens eine Position trägt das Präfix „"+code+"“ ("+info.desc+"). Die Kennzeichnungspflicht nach §12 Abs.4 GOÄneu ist erfüllt.",
+      kundentext: code==="E" ? kt("Für ausgelegte Sachkosten wurde ein gesonderter Auslagenersatz berechnet und entsprechend gekennzeichnet.","A separate reimbursement for out-of-pocket costs was charged and labelled accordingly.") : praefixKundentext(code)});
+  });
+
   pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 2 / Kap. 3.13", title:"Summenbildung und Schlussvermerk korrekt", detail:"Der Gesamtrechnungsbetrag entspricht der Summe der Einzelpositionen; der vorgeschriebene Schlussvermerk ist vorhanden.",
     kundentext:kt("Die Rechnungssumme wurde rechnerisch geprüft und ist korrekt.","The invoice total has been checked and is correct.")});
   return {pp, outcome:"Erwartetes Systemverhalten: Beleg wird ohne Beanstandung zur Erstattung angenommen."};
