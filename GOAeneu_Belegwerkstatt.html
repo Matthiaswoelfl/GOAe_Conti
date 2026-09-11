@@ -770,7 +770,20 @@ function generateBeleg(){
   const gewaehlt = pickN(fach.ziffern, randInt(2,3));
   const positionen = gewaehlt.map(z=>makeVergPos(z));
 
-  if(Math.random()<0.35){ positionen.push(makeSachkostenPos({unzulaessig:false})); }
+  /* §6a GOÄneu: vollstationäre/teilstationäre/vor-nachstationäre Behandlung — Pflichtminderung 25 % (Krankenhausarzt) bzw. 15 % (Belegarzt).
+     Allgemeinmedizin bleibt außen vor: Hausärzte behandeln praktisch nie im stationären Kontext nach §6a. */
+  let stationaer = null;
+  if(fach.name!=="Allgemeinmedizin" && Math.random()<0.28){
+    const rolle = pick(["Krankenhausarzt","Belegarzt"]);
+    stationaer = {rolle, art: pick(["vollstationär","teilstationär","vor-/nachstationär","stationsäquivalent"])};
+    if(rolle==="Krankenhausarzt"){
+      arzt.praxis = pick(["Klinikum","St.-Elisabeth-Krankenhaus","Universitätsklinikum","Städtisches Klinikum","Diakonie-Krankenhaus"])+" "+arzt.ort+" – Klinik für "+fach.name;
+    } else {
+      arzt.praxis = arzt.praxis+" (Belegabteilung)";
+    }
+  }
+
+  if(!stationaer && Math.random()<0.35){ positionen.push(makeSachkostenPos({unzulaessig:false})); }
 
   /* Präfix F: Früherkennungsleistung nach gesetzlich eingeführtem Programm */
   if(fach.frueherkennung && Math.random()<0.25){
@@ -788,16 +801,16 @@ function generateBeleg(){
   if(Math.random()<0.18){
     positionen.push(makeAnalogPos(fach.analog));
   }
-  /* Präfix W/R: Hausbesuch */
-  if(Math.random()<0.18){
+  /* Präfix W/R: Hausbesuch (entfällt bei stationärer Behandlung — kein Hausbesuch bei stationärem Aufenthalt) */
+  if(!stationaer && Math.random()<0.18){
     const km = randInt(1,32);
     if(km<=25) positionen.push(makeWegegeldPos({praefix:"W", km, nacht:Math.random()<0.2}));
     else positionen.push(makeWegegeldPos({praefix:"R", km, abwesenheitStd:randInt(1,4)}));
   }
 
-  /* Faktor-Grund im Alltag: entweder individuelle Honorarvereinbarung (HV, nur Kap. B) oder Tarif-Minderung (BT/ST/NT) für alle Leistungen */
+  /* Faktor-Grund im Alltag: entweder individuelle Honorarvereinbarung (HV, nur Kap. B, nicht bei stationärer Behandlung) oder Tarif-Minderung (BT/ST/NT) für alle Leistungen */
   let tarif = null;
-  if(Math.random()<0.12){
+  if(!stationaer && Math.random()<0.12){
     const hvKandidaten = positionen.filter(p=>p.kind==="leistung" && HV_FAEHIGE_ZIFFERN.includes(p.goaeNr));
     if(hvKandidaten.length){
       const p = pick(hvKandidaten);
@@ -822,18 +835,20 @@ function generateBeleg(){
   const rechnungsnummer = "RG-"+heute.getFullYear()+"-"+randInt(10000,99999);
   const abrechnungsstelle = Math.random()<0.4;
 
+  const minderung = stationaer ? {prozent: stationaer.rolle==="Krankenhausarzt"?25:15, art: stationaer.art, rolle: stationaer.rolle} : null;
+
   return {
     id: rechnungsnummer,
-    fach, arzt, patient, tarif,
+    fach, arzt, patient, tarif, stationaer,
     empfaenger: null, // null = identisch mit Patient
     verantwortlicheAerzte: [{lfdNr:1, anrede:arzt.anrede, titel:arzt.titel, name:arzt.vorname+" "+arzt.nachname, lanr:arzt.lanr}],
     diagnose: { text: diagnoseName, icd: fach.icd[diagnoseName], kennzeichen:null, entfaellt:false, entfaelltGrund:null },
     leistungsdatum, rechnungsdatum,
     positionen,
-    minderung: null, // {prozent, betrag}
+    minderung, // {prozent, art, rolle}
     ustSatz: null,
     weitereAngaben: null,
-    abrechnungsstelle,
+    abrechnungsstelle: stationaer ? false : abrechnungsstelle,
     stil: generateStil(),
     layout: pick(["a","b","c","d","e"]),
     kategorie: "korrekt",
@@ -913,6 +928,11 @@ function applyKorrekt(b){
   pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 3 GOÄneu", title:"Nummer, Anzahl und Titel der Leistungslegende vollständig", detail:"Für jede Position sind GOÄ-Nummer, Anzahl und ein patientenverständlicher Titel ausgewiesen.",
     kundentext:kt("Alle Pflichtangaben zu den abgerechneten Leistungen liegen vollständig vor.","All mandatory details for the billed services are complete.")});
 
+  if(b.minderung){
+    pp.push({status:"ok", rule:"§12 Abs. 2 Nr. 5 / §6a Abs. 1 GOÄneu", title:"Minderung bei stationärer Behandlung korrekt ausgewiesen", detail:"Die Behandlung ist als „"+b.minderung.art+"“ gekennzeichnet (Rolle: "+b.minderung.rolle+"). Die Rechnung weist die dafür vorgeschriebene Minderung von "+b.minderung.prozent+" % aus — 25 % für Krankenhausärzte, 15 % für Belegärzte bzw. niedergelassene andere Ärzte nach §6a Abs.1 GOÄneu — und ist damit für diesen Behandlungskontext korrekt berechnet.",
+      kundentext:kt("Für diese stationäre Behandlung wurde der gesetzlich vorgeschriebene Abschlag auf die Gebühren korrekt berücksichtigt.","The statutory reduction on the fees for this inpatient treatment has been applied correctly.")});
+  }
+
   const vorhandenePraefixe = new Set();
   b.positionen.forEach(p=>(p.praefixe||[]).forEach(code=>vorhandenePraefixe.add(code)));
   ["F","V","A","W","R","E"].forEach(code=>{
@@ -959,7 +979,7 @@ function applyGrenzfall(b){
     pp.push({status:"boundary", rule:"§8 Abs. 1 GOÄneu", title:"Besuchszeit exakt auf der Nachtsatz-Grenze", detail:"Der Nachtsatz gilt „zwischen 20 und 8 Uhr“. Ist der Besuch für exakt 20:00 Uhr dokumentiert, hängt die Anwendung des höheren Nachtsatzes (hier 20,00 € statt 13,00 €) davon ab, ob die Grenze inklusiv oder exklusiv ausgelegt wird.",
       kundentext:kt("Für den Besuch um 20:00 Uhr wurde der höhere Nachtsatz berechnet. Wir prüfen, ob der Besuch noch dem Tag- oder bereits dem Nachtzeitraum zuzuordnen ist.","The higher night rate was charged for the visit at 8:00 p.m. We are checking whether the visit falls within the day or the night period.")});
   } else if(subtype==="minderung_rolle"){
-    b.minderung = {prozent: 15, arztRolle:"Beleg-/niedergelassener Arzt (§6a Abs. 1 S. 2 GOÄneu)"};
+    b.minderung = {prozent: 15, art:"vollstationär", rolle:"Beleg-/niedergelassener Arzt"};
     addFlag(b.positionen[0],"boundary","§6a Abs. 1 GOÄneu","Minderungssatz 15 % nur korrekt, wenn tatsächlich ein Beleg- bzw. niedergelassener Arzt und kein Krankenhausarzt abrechnet.");
     pp.push({status:"boundary", rule:"§6a Abs. 1 S. 1–2 GOÄneu", title:"Minderungssatz hängt an der Arztrolle", detail:"§6a GOÄneu sieht 25 % Minderung bei Krankenhausärzten vor, aber nur 15 % „für Leistungen … von Belegärzten oder niedergelassenen anderen Ärzten“. Der Beleg weist 15 % aus — plausibel nur, wenn die Arztrolle im Einzelfall eindeutig als Beleg-/niedergelassener Arzt und nicht als angestellter Krankenhausarzt zu werten ist.",
       kundentext:kt("Von Ihrer Rechnung wurde ein Abschlag von 15 % vorgenommen, wie er für Belegärzte bzw. niedergelassene Ärzte gilt. Wir prüfen, ob diese Einordnung zutrifft.","A 15% reduction was applied to your invoice, as required for attending or private-practice physicians. We are checking whether this classification is correct.")});
@@ -991,7 +1011,7 @@ function applyGrenzfall(b){
 
 function applyVerstoss(b){
   const pp = [];
-  const pool = ["titel_fehlt","analog_ohne_praefix","diagnose_fehlt_unbegruendet","ab_ohne_konkretisierung","rechenfehler","sachkosten_unzulaessig","hv_verbotenes_kapitel","bmi_unter_schwelle","bmi_pflichtangabe_fehlt","gerinnung_ohne_begruendung","mehrfacheingriff_kein_abschlag"];
+  const pool = ["titel_fehlt","analog_ohne_praefix","diagnose_fehlt_unbegruendet","ab_ohne_konkretisierung","rechenfehler","sachkosten_unzulaessig","hv_verbotenes_kapitel","bmi_unter_schwelle","bmi_pflichtangabe_fehlt","gerinnung_ohne_begruendung","mehrfacheingriff_kein_abschlag","minderung_fehlt","stationaer_sachkosten"];
   const subtypes = pickN(pool, randInt(1,2));
   subtypes.forEach(subtype=>{
     if(subtype==="titel_fehlt"){
@@ -1081,6 +1101,28 @@ function applyVerstoss(b){
       pp.push({status:"violation", rule:s.quelle, title:"Mehrfacheingriff-Abschlag nicht angewendet", detail:"Beide Positionen zu Nr. "+pos2.goaeNr+" betreffen dieselbe Lokalisation mit demselben Zugang in derselben Sitzung. Die Bestimmung schreibt vor: „Sofern an derselben Lokalisation mit demselben Zugang mehrere Eingriffe in zeitlichem Zusammenhang durchgeführt werden, ist ab der zweiten Hauptleistung nur die "+s.faktor.toFixed(1).replace(".",",")+"-fache Gebühr zu berechnen.“ Hier ist die zweite Position aber zum vollen Satz abgerechnet.",
         kundentext:kt("Für den zweiten Eingriff an derselben Stelle in derselben Sitzung gilt ein reduzierter Satz. Dieser wurde nicht angewendet — wir korrigieren den Betrag entsprechend.","A reduced fee applies to the second procedure at the same site in the same session. This reduction was not applied — we are correcting the amount accordingly."),
         korrektur:{typ:"mehrfach", posId:pos2.id, faktor:s.faktor}});
+    } else if(subtype==="minderung_fehlt"){
+      const rolle = pick(["Krankenhausarzt","Belegarzt"]);
+      const art = pick(["vollstationär","teilstationär","stationsäquivalent"]);
+      const prozent = rolle==="Krankenhausarzt" ? 25 : 15;
+      b.stationaer = {rolle, art};
+      b.minderung = null;
+      addFlag(b.positionen[0],"violation","§6a Abs. 1 GOÄneu","Stationäre Behandlung, aber keine Minderung auf der Rechnung ausgewiesen.");
+      pp.push({status:"violation", rule:"§6a Abs. 1 GOÄneu", title:"Pflichtminderung bei stationärer Behandlung fehlt", detail:"Die Behandlung ist als „"+art+"“ gekennzeichnet (Rolle: "+rolle+"). §6a Abs.1 GOÄneu schreibt für solche Leistungen zwingend eine Minderung von "+prozent+" % vor — „sind die nach dieser Verordnung berechneten Gebühren um 25 Prozent zu mindern. Die Minderung für Leistungen … von Belegärzten oder niedergelassenen anderen Ärzten beträgt 15 Prozent.“ Auf dieser Rechnung fehlt die Minderung vollständig.",
+        kundentext:kt("Für diese stationäre Behandlung ist gesetzlich ein Abschlag auf die Gebühren vorgeschrieben. Dieser Abschlag fehlt auf der eingereichten Rechnung; wir korrigieren den Betrag entsprechend.","A statutory reduction on the fees is required for this inpatient treatment. This reduction is missing from the submitted invoice; we are adjusting the amount accordingly."),
+        korrektur:{typ:"minderung", prozent}});
+    } else if(subtype==="stationaer_sachkosten"){
+      const rolle = pick(["Krankenhausarzt","Belegarzt"]);
+      const art = pick(["vollstationär","teilstationär","stationsäquivalent"]);
+      const prozent = rolle==="Krankenhausarzt" ? 25 : 15;
+      b.stationaer = {rolle, art};
+      b.minderung = {prozent, art, rolle};
+      const sk = makeSachkostenPos({unzulaessig:false});
+      b.positionen.push(sk);
+      addFlag(sk,"violation","§6a Abs. 2 GOÄneu","Sachkosten trotz Minderungspflicht gesondert berechnet — bei geminderten stationären Gebühren grundsätzlich nicht gesondert berechnungsfähig.");
+      pp.push({status:"violation", rule:"§6a Abs. 2 GOÄneu", title:"Sachkosten trotz Minderungspflicht gesondert berechnet", detail:"Die Rechnung weist korrekt eine Minderung von "+prozent+" % aus („"+art+"“, "+rolle+"), berechnet aber zusätzlich Sachkosten gesondert. §6a Abs.2 GOÄneu bestimmt: „Neben den … geminderten Gebühren darf der Arzt Kosten nicht berechnen“, soweit die Leistung Bestandteil der allgemeinen Krankenhausleistungen ist.",
+        kundentext:kt("Neben der bereits geminderten stationären Gebühr wurden zusätzlich Sachkosten berechnet. Das ist bei stationären Leistungen grundsätzlich nicht zulässig — wir streichen diese Position.","In addition to the already-reduced inpatient fee, separate material costs were charged. This is generally not permitted for inpatient services, so we are removing this item."),
+        korrektur:{typ:"streichen", posId:sk.id}});
     }
   });
   return {pp, outcome:"Erwartetes Systemverhalten: Beleg wird zurückgewiesen bzw. es wird eine Nachforderung an die Praxis ausgelöst."};
@@ -1187,11 +1229,13 @@ function berechneKuerzung(beleg, pp){
   const positions = JSON.parse(JSON.stringify(beleg.positionen));
   const zeilen = [];
   let blockedAll = false;
+  let fehlendeMinderungProzent = 0;
   pp.forEach(item=>{
     if(!item.korrektur) return;
     const k = item.korrektur;
     if(k.typ==="gesamt"){ blockedAll = true; zeilen.push({titel:null, alt:null, neu:null, grundDe:item.kundentext.de, grundEn:item.kundentext.en, gesamt:true}); return; }
     if(k.typ==="rechenfehler"){ zeilen.push({titel:null, alt:null, neu:null, grundDe:item.kundentext.de, grundEn:item.kundentext.en}); return; }
+    if(k.typ==="minderung"){ fehlendeMinderungProzent = k.prozent; zeilen.push({titel:null, alt:null, neu:null, grundDe:item.kundentext.de, grundEn:item.kundentext.en}); return; }
     const pos = positions.find(x=>x.id===k.posId);
     if(!pos) return;
     const satz1 = pos.satz1!==undefined ? pos.satz1 : pos.betrag;
@@ -1202,7 +1246,11 @@ function berechneKuerzung(beleg, pp){
   const altGesamt = round2(summen(beleg).gesamt - (beleg.summenFehler||0));
   let neuGesamt;
   if(blockedAll){ neuGesamt = 0; }
-  else { const neuBeleg = Object.assign({}, beleg, {positionen:positions}); neuGesamt = round2(summen(neuBeleg).gesamt); }
+  else {
+    const neuBeleg = Object.assign({}, beleg, {positionen:positions});
+    const s2 = summen(neuBeleg);
+    neuGesamt = fehlendeMinderungProzent ? round2(s2.gesamt - round2(s2.vergSum*fehlendeMinderungProzent/100)) : s2.gesamt;
+  }
   return {zeilen, altGesamt, neuGesamt, diff: round2(altGesamt-neuGesamt)};
 }
 
@@ -1288,7 +1336,7 @@ function tableHtml(b){
   const shownGesamt = b.summenFehler ? round2(s.gesamt - b.summenFehler) : s.gesamt;
   let sumRows = '<tr class="sub"><td>Zwischensumme GOÄ-Leistungen</td><td class="num mono">'+euro(s.vergSum)+'</td></tr>';
   if(b.minderung){
-    sumRows += '<tr class="sub"><td>Minderung ('+b.minderung.prozent+' %, §6a GOÄ)</td><td class="num mono">– '+euro(s.minderung)+'</td></tr>';
+    sumRows += '<tr class="sub"><td>Minderung ('+b.minderung.prozent+' %'+(b.minderung.art?", "+esc(b.minderung.art):"")+', §6a GOÄneu)</td><td class="num mono">– '+euro(s.minderung)+'</td></tr>';
     sumRows += '<tr class="sub"><td>Gesamtbetrag ärztliche Leistungen</td><td class="num mono">'+euro(s.nachMinderung)+'</td></tr>';
   }
   if(s.sachkosten>0) sumRows += '<tr class="sub"><td>Gesamtbetrag Sachkosten/Auslagen</td><td class="num mono">'+euro(s.sachkosten)+'</td></tr>';
