@@ -160,6 +160,7 @@
   .beleg-id{font:500 .74rem/1 "IBM Plex Mono",monospace; color:var(--ink-soft);}
 
   .document{
+    --doc-accent: var(--accent-strong);
     background:var(--paper); color:var(--ink-doc);
     border:1px solid var(--paper-edge); border-radius:14px;
     box-shadow:var(--shadow-doc);
@@ -179,6 +180,15 @@
   }
   .document td.num, .document th.num{text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;}
   .document tr:last-child td{border-bottom:1.5px solid var(--paper-rule);}
+  /* optische Tabellen-Varianten (Inhalt/Spalten bleiben identisch) */
+  .document.linien-kraeftig th{border-bottom:2px solid var(--doc-accent); color:var(--doc-accent);}
+  .document.zebra tbody tr:nth-child(even) td{background:color-mix(in srgb, var(--doc-accent) 6%, transparent);}
+  /* Monogramm-Badge */
+  .monogramm{
+    width:42px; height:42px; border-radius:50%; background:var(--doc-accent); color:#fff; flex:none;
+    display:inline-flex; align-items:center; justify-content:center; font:700 .9rem "Source Sans 3",sans-serif; letter-spacing:.02em;
+  }
+  .monogramm.eckig{border-radius:9px;}
   .praefix-chip{
     display:inline-block; font:700 .68rem/1 "IBM Plex Mono",monospace; padding:2px 5px;
     border-radius:4px; background:rgba(20,122,114,.12); color:var(--accent-strong); margin-right:2px;
@@ -250,6 +260,32 @@
   .lay-c .closing{margin-top:20px; line-height:1.7;}
 
   .schlussvermerk{margin-top:22px; padding-top:12px; border-top:1px dashed var(--paper-rule); font-size:.78rem; font-style:italic; color:var(--ink-doc-soft);}
+
+  /* Layout D: modern/kompakt, kartenbasiert */
+  .lay-d .accent-bar{height:4px; border-radius:3px; background:var(--doc-accent); margin:-4px 0 20px;}
+  .lay-d .doc-head{display:flex; align-items:flex-start; gap:14px; margin-bottom:20px; flex-wrap:wrap;}
+  .lay-d .titleblock{flex:1; min-width:200px;}
+  .lay-d .practice-name{font:800 1.1rem "Source Sans 3",sans-serif; letter-spacing:-0.01em;}
+  .lay-d .fach-pill{
+    display:inline-block; margin-top:6px; font:600 .64rem "Source Sans 3",sans-serif; text-transform:uppercase; letter-spacing:.05em;
+    padding:3px 9px; border-radius:999px; background:color-mix(in srgb, var(--doc-accent) 15%, transparent); color:var(--doc-accent);
+  }
+  .lay-d .contact-line{font-family:"Source Sans 3",sans-serif; font-size:.78rem; color:var(--ink-doc-soft); margin-top:6px; line-height:1.5;}
+  .lay-d .idcard{background:rgba(0,0,0,.03); border:1px solid var(--paper-rule); border-radius:10px; padding:12px 16px; font-family:"Source Sans 3",sans-serif; font-size:.78rem; text-align:right; min-width:180px;}
+  .lay-d .idcard .amt{font:800 1.2rem "Source Sans 3",sans-serif; color:var(--doc-accent); margin-top:3px;}
+  .lay-d .cards-row{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:8px;}
+  .lay-d .info-card{border:1px solid var(--paper-rule); border-left:3px solid var(--doc-accent); border-radius:8px; padding:12px 14px;}
+
+  /* Layout E: Klinik-Kopfbogen mit Farbband */
+  .lay-e .band{
+    background:var(--doc-accent); color:#fff; border-radius:10px; padding:16px 20px; margin-bottom:20px;
+    display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .lay-e .band .klinikname{font:800 1.15rem "Source Sans 3",sans-serif; letter-spacing:-0.01em;}
+  .lay-e .band .fach{font-family:"Source Sans 3",sans-serif; font-size:.78rem; opacity:.88; margin-top:2px;}
+  .lay-e .band .rgnr{font:600 .78rem "IBM Plex Mono",monospace; text-align:right; opacity:.92;}
+  .lay-e .meta-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:8px;}
+  .lay-e .meta-box{border:1px solid var(--paper-rule); border-radius:8px; padding:12px 14px;}
 
   /* ---------- Category picker ---------- */
   .category-picker{margin-top:34px;}
@@ -684,6 +720,28 @@ function makeAnalogPos(a, opts){
   };
 }
 
+/* Rein optische Varianz je Praxis (Akzentfarbe/Monogramm/Kopf-Typografie) — betrifft nur den Rechnungskopf, nie Feldnamen oder Vergütungstabelle */
+const PRAXIS_PALETTE = [
+  {name:"Petrol",     farbe:"#0f6d6a"},
+  {name:"Bordeaux",   farbe:"#8a2f3f"},
+  {name:"Waldgrün",   farbe:"#2f6b4f"},
+  {name:"Ocker",      farbe:"#a3691c"},
+  {name:"Schiefer",   farbe:"#3d5a80"},
+  {name:"Terrakotta", farbe:"#b5542f"},
+  {name:"Aubergine",  farbe:"#6b4372"},
+  {name:"Anthrazit",  farbe:"#3a4148"},
+];
+function generateStil(){
+  const p = pick(PRAXIS_PALETTE);
+  return {
+    farbe: p.farbe,
+    monogramm: Math.random()<0.55,
+    kopfSerif: Math.random()<0.4,
+    zebra: Math.random()<0.5,
+    linien: pick(["fein","kraeftig"]),
+  };
+}
+
 function generateBeleg(){
   const fach = pick(FACHRICHTUNGEN);
   const arzt = generateArzt(fach);
@@ -714,7 +772,8 @@ function generateBeleg(){
     ustSatz: null,
     weitereAngaben: null,
     abrechnungsstelle,
-    layout: pick(["a","b","c"]),
+    stil: generateStil(),
+    layout: pick(["a","b","c","d","e"]),
     kategorie: "korrekt",
     summenFehler: 0,
   };
@@ -1161,6 +1220,14 @@ function diagBlock(b){
   return '<div class="diag-line"><span class="label">'+dot("p")+'Diagnose / Behandlungsanlass</span>'+esc(b.diagnose.text)+' <span class="mono" style="font-size:.85em;color:var(--ink-doc-soft)">(ICD-10 '+esc(b.diagnose.icd)+')</span>'+kz+'</div>';
 }
 
+function initials(text){
+  return text.split(/\s+/).filter(w=>w.length>1 && !/^(für|von|und|der|die|das|im|am)$/i.test(w)).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+}
+function monogrammHtml(b, eckig){
+  const txt = initials(b.arzt.praxis) || initials(b.arzt.nachname);
+  return '<span class="monogramm'+(eckig?" eckig":"")+'">'+esc(txt)+'</span>';
+}
+
 function empfaengerBlock(b){
   const e = b.empfaenger || b.patient;
   const isPatient = !b.empfaenger;
@@ -1184,8 +1251,11 @@ function renderLayoutA(b){
   const s = summen(b);
   return '<div class="lay-a">'+
     '<div class="doc-head">'+
-      '<div class="practice"><div class="name">'+esc(b.arzt.praxis)+'</div>'+
+      '<div style="display:flex; gap:12px; align-items:flex-start;">'+
+      (b.stil.monogramm ? monogrammHtml(b) : "")+
+      '<div class="practice"><div class="name" style="color:var(--doc-accent);'+(b.stil.kopfSerif?' font-family:\'Source Serif 4\',Georgia,serif;':'')+'">'+esc(b.arzt.praxis)+'</div>'+
       '<div class="sub">'+esc(b.arzt.titel)+' '+esc(b.arzt.vorname)+' '+esc(b.arzt.nachname)+' · '+esc(b.arzt.fach)+'<br>'+esc(b.arzt.strasse)+', '+esc(b.arzt.plz)+' '+esc(b.arzt.ort)+'</div></div>'+
+      '</div>'+
       '<div class="recipient">'+empfaengerBlock(b)+'</div>'+
     '</div>'+
     '<h3 class="doc-title">Rechnung Nr. '+esc(b.id)+'</h3>'+
@@ -1207,7 +1277,7 @@ function renderLayoutB(b){
   return '<div class="lay-b">'+
     '<div class="doc-head">'+
       '<div>'+(b.abrechnungsstelle?'<div class="pvs-tag">Abrechnung im Auftrag von '+esc(b.arzt.titel)+' '+esc(b.arzt.nachname)+'</div>':'')+
-      '<div class="doc-title">Honorarrechnung '+esc(b.id)+'</div>'+
+      '<div class="doc-title" style="color:var(--doc-accent);">'+(b.stil.monogramm?monogrammHtml(b)+' ':'')+'Honorarrechnung '+esc(b.id)+'</div>'+
       '<div class="field-block">'+esc(b.arzt.titel)+' '+esc(b.arzt.vorname)+' '+esc(b.arzt.nachname)+', '+esc(b.arzt.fach)+'<br>'+esc(b.arzt.praxis)+' · '+esc(b.arzt.strasse)+', '+esc(b.arzt.plz)+' '+esc(b.arzt.ort)+
       (b.abrechnungsstelle?'<br><span style="color:var(--ink-doc-soft); font-size:.85em;">Abrechnungsstelle: MedAbrechnung '+esc(b.arzt.ort)+' GmbH · IBAN '+esc(b.arzt.iban)+'</span>':'')+'</div></div>'+
       '<div class="idbox">'+dot("p")+'<b>Rechnungsdatum</b>'+fmtDate(b.rechnungsdatum)+'<br>'+dot("p")+'<b>Leistungsdatum</b>'+fmtDate(b.leistungsdatum)+'<br>'+dot("p")+'<b>Gesamtrechnungsbetrag</b>'+euro(s.gesamt)+'</div>'+
@@ -1228,8 +1298,9 @@ function renderLayoutC(b){
   const e = b.empfaenger || b.patient;
   return '<div class="lay-c">'+
     '<div class="doc-head">'+
-      '<div class="practice-line">'+esc(b.arzt.titel)+' '+esc(b.arzt.vorname)+' '+esc(b.arzt.nachname)+'</div>'+
-      '<div class="addr-line">'+esc(b.arzt.praxis)+' · '+esc(b.arzt.strasse)+' · '+esc(b.arzt.plz)+' '+esc(b.arzt.ort)+'</div>'+
+      '<div style="display:flex; gap:10px; align-items:baseline;">'+(b.stil.monogramm?monogrammHtml(b,true):"")+
+      '<div><div class="practice-line" style="color:var(--doc-accent); border-bottom:2px solid var(--doc-accent); display:inline-block; padding-bottom:2px;">'+esc(b.arzt.titel)+' '+esc(b.arzt.vorname)+' '+esc(b.arzt.nachname)+'</div>'+
+      '<div class="addr-line">'+esc(b.arzt.praxis)+' · '+esc(b.arzt.strasse)+' · '+esc(b.arzt.plz)+' '+esc(b.arzt.ort)+'</div></div></div>'+
       '<div class="recipient">'+(e.anrede?esc(e.anrede)+" ":"")+(e.titel?esc(e.titel)+" ":"")+esc(e.vorname?e.vorname+" ":"")+esc(e.nachname)+'<br>'+esc(e.strasse)+'<br>'+esc(e.plz)+' '+esc(e.ort)+'</div>'+
       '<div class="place-date">'+esc(b.arzt.ort)+', den '+fmtDate(b.rechnungsdatum)+'</div>'+
       '<div class="subject">Rechnung Nr. '+esc(b.id)+' über privatärztliche Leistungen</div>'+
@@ -1244,13 +1315,60 @@ function renderLayoutC(b){
   '</div>';
 }
 
+function renderLayoutD(b){
+  const s = summen(b);
+  const geb = fmtDate(b.patient.geboren);
+  return '<div class="lay-d">'+
+    '<div class="accent-bar"></div>'+
+    '<div class="doc-head">'+
+      (b.stil.monogramm?monogrammHtml(b):"")+
+      '<div class="titleblock">'+
+        '<div class="practice-name">'+esc(b.arzt.praxis)+'</div>'+
+        '<span class="fach-pill">'+esc(b.arzt.fach)+'</span>'+
+        '<div class="contact-line">'+esc(b.arzt.titel)+' '+esc(b.arzt.vorname)+' '+esc(b.arzt.nachname)+' · '+esc(b.arzt.strasse)+', '+esc(b.arzt.plz)+' '+esc(b.arzt.ort)+'</div>'+
+      '</div>'+
+      '<div class="idcard">Rechnung '+esc(b.id)+'<br>'+fmtDate(b.rechnungsdatum)+'<div class="amt">'+euro(s.gesamt)+'</div></div>'+
+    '</div>'+
+    '<div class="cards-row">'+
+      '<div class="info-card">'+empfaengerBlock(b)+'</div>'+
+      '<div class="info-card"><div class="field-block"><div class="label">'+dot("p")+'Patientin/Patient</div>'+esc(b.patient.anrede)+' '+esc(b.patient.vorname)+' '+esc(b.patient.nachname)+'<br>geb. '+geb+'</div></div>'+
+    '</div>'+
+    diagBlock(b)+
+    '<div class="section-title">Vergütungen</div>'+
+    tableHtml(b)+
+    '<div class="schlussvermerk">Verantwortlich: '+verantwortlicherArztBlock(b)+'Diese Rechnung ist maschinell erstellt und ohne Unterschrift gültig. · IBAN '+esc(b.arzt.iban)+'</div>'+
+  '</div>';
+}
+
+function renderLayoutE(b){
+  const s = summen(b);
+  return '<div class="lay-e">'+
+    '<div class="band">'+
+      '<div><div class="klinikname">'+esc(b.arzt.praxis)+'</div><div class="fach">'+esc(b.arzt.titel)+' '+esc(b.arzt.vorname)+' '+esc(b.arzt.nachname)+' · '+esc(b.arzt.fach)+'</div></div>'+
+      '<div class="rgnr">Rechnung '+esc(b.id)+'<br>'+fmtDate(b.rechnungsdatum)+'</div>'+
+    '</div>'+
+    '<div class="meta-grid">'+
+      '<div class="meta-box">'+empfaengerBlock(b)+'</div>'+
+      '<div class="meta-box"><div class="field-block"><div class="label">'+dot("p")+'Patientin/Patient</div>'+esc(b.patient.anrede)+' '+esc(b.patient.vorname)+' '+esc(b.patient.nachname)+'<br>geb. '+fmtDate(b.patient.geboren)+'</div></div>'+
+    '</div>'+
+    diagBlock(b)+
+    '<div class="section-title">Vergütungen</div>'+
+    tableHtml(b)+
+    '<div class="schlussvermerk">Verantwortlich: '+verantwortlicherArztBlock(b)+'Zahlung bitte auf IBAN '+esc(b.arzt.iban)+' unter Angabe der Rechnungsnummer '+esc(b.id)+' · Gesamtbetrag '+euro(s.gesamt)+'.<br>Diese Rechnung ist maschinell erstellt und ohne Unterschrift gültig.</div>'+
+  '</div>';
+}
+
+const LAYOUT_RENDERERS = {a:renderLayoutA, b:renderLayoutB, c:renderLayoutC, d:renderLayoutD, e:renderLayoutE};
 function renderDocument(b){
   const el = document.getElementById("document");
-  el.className = "document lay-"+b.layout;
-  const fn = b.layout==="a" ? renderLayoutA : b.layout==="b" ? renderLayoutB : renderLayoutC;
-  el.innerHTML = fn(b);
+  const classes = ["document","lay-"+b.layout];
+  if(b.stil.zebra) classes.push("zebra");
+  if(b.stil.linien==="kraeftig") classes.push("linien-kraeftig");
+  el.className = classes.join(" ");
+  el.style.setProperty("--doc-accent", b.stil.farbe);
+  el.innerHTML = LAYOUT_RENDERERS[b.layout](b);
   document.getElementById("beleg-id").textContent = b.id;
-  const layoutNames = {a:"Klassisch-tabellarisch", b:"PVS-Stil (Abrechnungsstelle)", c:"Brief-Stil"};
+  const layoutNames = {a:"Klassisch-tabellarisch", b:"PVS-Stil (Abrechnungsstelle)", c:"Brief-Stil", d:"Modern/kompakt", e:"Klinik-Kopfbogen"};
   document.getElementById("layout-badge").innerHTML = "Kopf-Layout: <b>"+layoutNames[b.layout]+"</b> · Vergütungstabelle: fixe Feldnamen &amp; Reihenfolge lt. Formular";
 }
 
